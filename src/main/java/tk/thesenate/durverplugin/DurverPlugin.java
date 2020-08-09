@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class DurverPlugin extends JavaPlugin {
 
+    // Putting this here to make a new commit. Keep things like this!
     private final CompassWorker compassWorker = new CompassWorker();
     private final Thread pointCompass = new Thread(compassWorker);
 
@@ -19,7 +20,5 @@ public class DurverPlugin extends JavaPlugin {
         getLogger().info("Durver plugin disabled.");
         // compassWorker.stopRunning();
     }
-
-
 
 }
