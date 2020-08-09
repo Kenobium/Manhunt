@@ -1,0 +1,19 @@
+name: DurverPlugin
+description: A multi-purpose plugin custom-made for the Durver.
+version: 1.0.0
+main: tk.thesenate.durverplugin.DurverPlugin
+commands:
+  manhunt:
+    description: Add or remove hunters, and start a manhunt game.
+    usage: >
+      Usage is /manhunt <hunter/runner> <add/remove> <players>
+      then /manhunt <start/stop>
+    permission: durver.manhunt
+permissions:
+  durver.*:
+    description: Gives access to all DurverPlugin commands.
+    children:
+      durver.manhunt: true
+  durver.manhunt:
+    description: Gives access to manhunt command.
+    default: op
