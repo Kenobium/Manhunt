@@ -4,8 +4,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class DurverPlugin extends JavaPlugin {
 
-    //private final CompassWorker compassWorker = new CompassWorker();
-    private final Thread pointCompass = new Thread(new CompassWorker());
+    private final CompassWorker compassWorker = new CompassWorker();
+    private final Thread pointCompass = new Thread(compassWorker);
 
     @Override
     public void onEnable() {
