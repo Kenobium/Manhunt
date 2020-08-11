@@ -6,7 +6,7 @@ commands:
   manhunt:
     description: Add or remove hunters, and start a manhunt game.
     usage: >
-      Usage is /manhunt <hunter/runner> <add/remove> <players>
+      Usage is /manhunt <addHunter/removeHunter> <players>
       then /manhunt <start/stop>
     permission: durver.manhunt
 permissions:

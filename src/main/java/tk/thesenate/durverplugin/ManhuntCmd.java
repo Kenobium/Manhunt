@@ -16,16 +16,16 @@ import static org.bukkit.Bukkit.getPlayer;
 
 public class ManhuntCmd implements CommandExecutor {
 
-    protected static final HashSet<UUID> hunters = new HashSet<>();
+    protected final HashSet<UUID> hunters = new HashSet<>();
     // private final HashSet<UUID> runners = new HashSet<>();
-    protected static volatile boolean manhuntOngoing = false;
+    protected volatile boolean manhuntOngoing = false;
+    protected final ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         // "Manhunt" command
         if (command.getName().equalsIgnoreCase("manhunt")) {
-            ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
 
             // Add hunters
             if (args[0].equalsIgnoreCase("addHunter")) {
@@ -40,7 +40,6 @@ public class ManhuntCmd implements CommandExecutor {
                         return true;
                     } else {
                         hunters.add(player.getUniqueId());
-                        sender.sendMessage(hunters.toString());
                         sender.sendMessage(ChatColor.GREEN + "Player(s) added to team 'hunters'.");
                         return true;
                     }

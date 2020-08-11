@@ -2,7 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for DurverCustomPlugin" enabled="true">
+      <profile name="Annotation profile for DurverPlugin" enabled="true">
         <sourceOutputDir name="../../OneDrive/Desktop/TheSenate2/hunt/plugins/generated-sources/annotations" />
         <sourceTestOutputDir name="../../OneDrive/Desktop/TheSenate2/hunt/plugins/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
