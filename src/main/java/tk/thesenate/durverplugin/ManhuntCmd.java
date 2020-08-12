@@ -8,29 +8,28 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getPlayer;
 
 public class ManhuntCmd implements CommandExecutor {
 
-    protected final HashSet<UUID> hunters = new HashSet<>();
-    // private final HashSet<UUID> runners = new HashSet<>();
-    protected volatile boolean manhuntOngoing = false;
-    protected final ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
+    final ArrayList<UUID> hunters = new ArrayList<>();
+    final ArrayList<UUID> runners = new ArrayList<>();
+    volatile boolean manhuntOngoing = false;
+    final ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         // "Manhunt" command
         if (command.getName().equalsIgnoreCase("manhunt")) {
-
+            sender.sendMessage(Arrays.toString(args));
             // Add hunters
             if (args[0].equalsIgnoreCase("addHunter")) {
-
-                for (String i : Arrays.copyOfRange(args, 1, args.length)) {
+                /*for (String i : Arrays.copyOfRange(args, 1, args.length)) {
                     Player player = getPlayer(i);
                     if (player == null) {
                         sender.sendMessage(ChatColor.RED + "One or more players were not found.");
@@ -43,11 +42,14 @@ public class ManhuntCmd implements CommandExecutor {
                         sender.sendMessage(ChatColor.GREEN + "Player(s) added to team 'hunters'.");
                         return true;
                     }
-                }
+                }*/
+
+                addPlayers(sender, args, hunters);
+                return true;
 
                 // Remove hunters
             } else if (args[0].equalsIgnoreCase("removeHunter")) {
-                for (String i : Arrays.copyOfRange(args, 1, args.length)) {
+                /*for (String i : Arrays.copyOfRange(args, 1, args.length)) {
                     Player player = getPlayer(i);
                     if (player == null) {
                         sender.sendMessage(ChatColor.RED + "One or more players were not found.");
@@ -60,7 +62,22 @@ public class ManhuntCmd implements CommandExecutor {
                         sender.sendMessage(ChatColor.GREEN + "Player(s) removed from team 'hunters'.");
                         return true;
                     }
-                }
+                }*/
+
+                removePlayers(sender, args, hunters);
+                return true;
+
+                // Add speedrunners
+            } else if (args[0].equalsIgnoreCase("addRunner")) {
+
+                addPlayers(sender, args, runners);
+                return true;
+
+                // Remove speedrunners
+            } else if (args[0].equalsIgnoreCase("removeRunner")) {
+
+                removePlayers(sender, args, runners);
+                return true;
 
                 // Begin manhunt
             } else if (args[0].equalsIgnoreCase("start")) {
@@ -85,20 +102,30 @@ public class ManhuntCmd implements CommandExecutor {
                         hunters.remove(k);
                         continue;
                     }
-                    hunter.getInventory().removeItem(trackerCompass);
+                    hunter.getInventory().setItem(0, new ItemStack(Material.AIR));
                 }
                 return true;
 
-            } /*else if (args[0].equalsIgnoreCase("test")) {
-                //sender.sendMessage(getNearestPlayer((Player) sender).toString());
-                //getLogger().info(String.valueOf(manhuntOngoing));
-                return true;
-            }*/
+            } else if (args[0].equalsIgnoreCase("list")) {
+                ArrayList<String> huntersList = new ArrayList<>();
+                ArrayList<String> runnersList = new ArrayList<>();
+                for (UUID i: hunters) {
+                    huntersList.add(getPlayer(i).getName());
+                }
+
+                for (UUID j: runners) {
+                    runnersList.add(getPlayer(j).getName());
+                }
+
+                sender.sendMessage(huntersList.toString());
+                sender.sendMessage(runnersList.toString());
+
+            }
         }
         return false;
     }
 
-    protected Player getNearestPlayer(Player player) {
+    Player getNearestPlayer(Player player) {
         Player nearest = null;
         double lastDistance = Double.MAX_VALUE;
         for (Player p : player.getWorld().getPlayers()) {
@@ -114,16 +141,47 @@ public class ManhuntCmd implements CommandExecutor {
         return nearest;
     }
 
-//    protected boolean getManhuntStatus() {
-//        return manhuntOngoing;
-//    }
-//
-//    protected HashSet<UUID> getHunters() {
-//        return hunters;
-//    }
-//
-//    private void pointCompass(HashSet<UUID> h) {
-//
-//    }
+    private void addPlayers(CommandSender sender, String[] args, ArrayList<UUID> team) {
+        String teamName = " ";
 
+        if (team.equals(hunters)) {
+            teamName = "'hunters'";
+        } else if (team.equals(runners)) {
+            teamName = "'speedrunners'";
+        }
+
+        for (String i : Arrays.copyOfRange(args, 1, args.length)) {
+            Player player = getPlayer(i);
+            if (player == null) {
+                sender.sendMessage(ChatColor.RED + "One or more players were not found.");
+            } else if (team.contains(player.getUniqueId())) { // HashSet.add() will return false if contains element. maybe refactor l8r
+                sender.sendMessage(ChatColor.RED + "Player(s) is already on team " + teamName + ".");
+            } else {
+                team.add(player.getUniqueId());
+                sender.sendMessage(ChatColor.GREEN + "Player(s) added to team " + teamName + ".");
+            }
+        }
+    }
+
+    private void removePlayers(CommandSender sender, String[] args, ArrayList<UUID> team) {
+        String teamName = " ";
+
+        if (team.equals(hunters)) {
+            teamName = "'hunters'";
+        } else if (team.equals(runners)) {
+            teamName = "'speedrunners'";
+        }
+
+        for (String i : Arrays.copyOfRange(args, 1, args.length)) {
+            Player player = getPlayer(i);
+            if (player == null) {
+                sender.sendMessage(ChatColor.RED + "One or more players were not found.");
+            } else if (!team.contains(player.getUniqueId())) {
+                sender.sendMessage(ChatColor.RED + "Player(s) not found on team " + teamName + ".");
+            } else {
+                team.remove(player.getUniqueId());
+                sender.sendMessage(ChatColor.GREEN + "Player(s) removed from team " + teamName + ".");
+            }
+        }
+    }
 }
