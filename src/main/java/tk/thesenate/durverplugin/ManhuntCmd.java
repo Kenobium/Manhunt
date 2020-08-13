@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getPlayer;
+import static org.bukkit.Bukkit.getServer;
 
 public class ManhuntCmd implements CommandExecutor {
 
@@ -77,7 +78,13 @@ public class ManhuntCmd implements CommandExecutor {
                         hunters.remove(k);
                         continue;
                     }
-                    hunter.getInventory().setItem(0, new ItemStack(Material.AIR));
+                    for (int l = 0; l < hunter.getInventory().getSize(); l++) {
+                        if (trackerCompass.equals(hunter.getInventory().getItem(l))) {
+                            hunter.getInventory().setItem(l, new ItemStack(Material.AIR));
+                            break;
+                        }
+                    }
+                    hunter.setCompassTarget(hunter.getWorld().getSpawnLocation());
                 }
                 return true;
 
