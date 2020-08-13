@@ -7,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,51 +19,23 @@ public class ManhuntCmd implements CommandExecutor {
 
     final ArrayList<UUID> hunters = new ArrayList<>();
     final ArrayList<UUID> runners = new ArrayList<>();
-    volatile boolean manhuntOngoing = false;
     final ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
+    volatile boolean manhuntOngoing = false;
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         // "Manhunt" command
         if (command.getName().equalsIgnoreCase("manhunt")) {
-            sender.sendMessage(Arrays.toString(args));
             // Add hunters
             if (args[0].equalsIgnoreCase("addHunter")) {
-                /*for (String i : Arrays.copyOfRange(args, 1, args.length)) {
-                    Player player = getPlayer(i);
-                    if (player == null) {
-                        sender.sendMessage(ChatColor.RED + "One or more players were not found.");
-                        return true;
-                    } else if (hunters.contains(player.getUniqueId())) { // HashSet.add() will return false if contains element. maybe refactor l8r
-                        sender.sendMessage(ChatColor.RED + "Player(s) is already on team 'hunters'.");
-                        return true;
-                    } else {
-                        hunters.add(player.getUniqueId());
-                        sender.sendMessage(ChatColor.GREEN + "Player(s) added to team 'hunters'.");
-                        return true;
-                    }
-                }*/
 
                 addPlayers(sender, args, hunters);
                 return true;
 
                 // Remove hunters
             } else if (args[0].equalsIgnoreCase("removeHunter")) {
-                /*for (String i : Arrays.copyOfRange(args, 1, args.length)) {
-                    Player player = getPlayer(i);
-                    if (player == null) {
-                        sender.sendMessage(ChatColor.RED + "One or more players were not found.");
-                        return true;
-                    } else if (!hunters.contains(player.getUniqueId())) {
-                        sender.sendMessage(ChatColor.RED + "Player(s) not found on team 'hunters'.");
-                        return true;
-                    } else {
-                        hunters.remove(player.getUniqueId());
-                        sender.sendMessage(ChatColor.GREEN + "Player(s) removed from team 'hunters'.");
-                        return true;
-                    }
-                }*/
 
                 removePlayers(sender, args, hunters);
                 return true;
@@ -82,7 +55,9 @@ public class ManhuntCmd implements CommandExecutor {
                 // Begin manhunt
             } else if (args[0].equalsIgnoreCase("start")) {
                 manhuntOngoing = true;
-                //getLogger().info(String.valueOf(manhuntOngoing));
+                ItemMeta compassName = trackerCompass.getItemMeta();
+                compassName.setDisplayName(ChatColor.DARK_PURPLE + "Tracker Compass");
+                trackerCompass.setItemMeta(compassName);
                 for (UUID j : hunters) {
                     Player hunter = getPlayer(j);
                     if (hunter == null) {
@@ -119,6 +94,7 @@ public class ManhuntCmd implements CommandExecutor {
 
                 sender.sendMessage(huntersList.toString());
                 sender.sendMessage(runnersList.toString());
+                return true;
 
             }
         }
@@ -153,12 +129,12 @@ public class ManhuntCmd implements CommandExecutor {
         for (String i : Arrays.copyOfRange(args, 1, args.length)) {
             Player player = getPlayer(i);
             if (player == null) {
-                sender.sendMessage(ChatColor.RED + "One or more players were not found.");
+                sender.sendMessage(ChatColor.RED + "Player not found.");
             } else if (team.contains(player.getUniqueId())) { // HashSet.add() will return false if contains element. maybe refactor l8r
-                sender.sendMessage(ChatColor.RED + "Player(s) is already on team " + teamName + ".");
+                sender.sendMessage(ChatColor.RED + "Player is already on team " + teamName + ".");
             } else {
                 team.add(player.getUniqueId());
-                sender.sendMessage(ChatColor.GREEN + "Player(s) added to team " + teamName + ".");
+                sender.sendMessage(ChatColor.GREEN + "Player added to team " + teamName + ".");
             }
         }
     }
@@ -175,12 +151,12 @@ public class ManhuntCmd implements CommandExecutor {
         for (String i : Arrays.copyOfRange(args, 1, args.length)) {
             Player player = getPlayer(i);
             if (player == null) {
-                sender.sendMessage(ChatColor.RED + "One or more players were not found.");
+                sender.sendMessage(ChatColor.RED + "Player not found.");
             } else if (!team.contains(player.getUniqueId())) {
-                sender.sendMessage(ChatColor.RED + "Player(s) not found on team " + teamName + ".");
+                sender.sendMessage(ChatColor.RED + "Player not found on team " + teamName + ".");
             } else {
                 team.remove(player.getUniqueId());
-                sender.sendMessage(ChatColor.GREEN + "Player(s) removed from team " + teamName + ".");
+                sender.sendMessage(ChatColor.GREEN + "Player removed from team " + teamName + ".");
             }
         }
     }

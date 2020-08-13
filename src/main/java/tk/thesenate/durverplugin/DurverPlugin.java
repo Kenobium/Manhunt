@@ -21,7 +21,7 @@ public class DurverPlugin extends JavaPlugin implements Listener {
 
     ManhuntCmd manhuntCmd = new ManhuntCmd();
     Player tracking;
-    boolean compassManuallySet = false;
+    //boolean compassManuallySet = false;
     boolean trackingNearestPlayer = true;
     int currentTargetIndex = -1;
 
@@ -42,7 +42,7 @@ public class DurverPlugin extends JavaPlugin implements Listener {
                         continue;
                     }
 
-                    if (!compassManuallySet) {
+                    if (trackingNearestPlayer) { //!compassManuallySet
                         tracking = manhuntCmd.getNearestPlayer(hunter);
                     }
 
@@ -53,14 +53,14 @@ public class DurverPlugin extends JavaPlugin implements Listener {
             }
         }, 1L, 1L);
 
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+        /*Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 Bukkit.getLogger().info(String.valueOf(currentTargetIndex));
                 Bukkit.getLogger().info(String.valueOf(trackingNearestPlayer));
             }
 
-        }, 250L, 250L);
+        }, 250L, 250L);*/
     }
 
     @Override
@@ -80,15 +80,7 @@ public class DurverPlugin extends JavaPlugin implements Listener {
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
         if (manhuntCmd.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), manhuntCmd.trackerCompass) && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
 
-            //tracking = manhuntCmd.runners.size() > manhuntCmd.runners.indexOf(manhuntCmd.getNearestPlayer(event.getPlayer()).getUniqueId()) + 1 ? getPlayer(manhuntCmd.runners.get(manhuntCmd.runners.indexOf(manhuntCmd.getNearestPlayer(event.getPlayer()).getUniqueId()) + 1)) : getPlayer(manhuntCmd.runners.get(0));
-
-            /*if (manhuntCmd.runners.size() >= manhuntCmd.runners.indexOf(tracking.getUniqueId()) + 1) {
-                tracking = getPlayer(manhuntCmd.runners.get(manhuntCmd.runners.indexOf(manhuntCmd.getNearestPlayer(event.getPlayer()).getUniqueId()) + 1));
-            } else {
-                tracking = getPlayer(manhuntCmd.runners.get(0));
-            }*/
-
-            compassManuallySet = true;
+            //compassManuallySet = true;
 
             if (currentTargetIndex + 1 < manhuntCmd.runners.size()) {
                 trackingNearestPlayer = false;
@@ -97,17 +89,9 @@ public class DurverPlugin extends JavaPlugin implements Listener {
             } else {
                 trackingNearestPlayer = true;
                 currentTargetIndex = -1;
-                compassManuallySet = false;
+                //compassManuallySet = false;
                 //tracking = manhuntCmd.getNearestPlayer(event.getPlayer());
             }
-
-            /*Iterator<UUID> runnersIterator = manhuntCmd.runners.iterator();
-            if (runnersIterator.hasNext()) {
-
-                tracking = getPlayer(runnersIterator.next());
-            } else {
-                runnersIterator = manhuntCmd.runners.iterator();
-            }*/
 
             ItemMeta trackerMeta = manhuntCmd.trackerCompass.getItemMeta();
 
@@ -117,9 +101,9 @@ public class DurverPlugin extends JavaPlugin implements Listener {
                 trackerMeta.setDisplayName("Tracking nearest player");
             }
 
-            if (event.getHand().equals(EquipmentSlot.HAND)) {
+            if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
                 event.getPlayer().getInventory().getItemInMainHand().setItemMeta(trackerMeta);
-            } else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
+            } else if (Objects.equals(event.getHand(), EquipmentSlot.OFF_HAND)) {
                 event.getPlayer().getInventory().getItemInOffHand().setItemMeta(trackerMeta);
             }
 

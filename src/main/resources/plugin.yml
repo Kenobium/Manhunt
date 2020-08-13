@@ -1,7 +1,8 @@
 name: DurverPlugin
 description: A multi-purpose plugin custom-made for the Durver.
-version: 1.0.0
+version: '0.1.2'
 main: tk.thesenate.durverplugin.DurverPlugin
+api-version: '1.16'
 commands:
   manhunt:
     description: Add or remove hunters, and start a manhunt game.
