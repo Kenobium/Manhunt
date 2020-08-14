@@ -2,10 +2,13 @@ package tk.thesenate.durverplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -17,6 +20,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getPlayer;
+import static org.bukkit.Bukkit.getServerIcon;
 
 public class DurverPlugin extends JavaPlugin implements Listener {
 
@@ -117,8 +121,21 @@ public class DurverPlugin extends JavaPlugin implements Listener {
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         if (manhuntCmd.manhuntOngoing && manhuntCmd.hunters.contains(event.getPlayer().getUniqueId())) {
             event.getPlayer().getInventory().addItem(manhuntCmd.trackerCompass);
+
         }
     }
+
+    @EventHandler
+    public void onPlayerDeathEvent(PlayerDeathEvent event) {
+        if (manhuntCmd.manhuntOngoing && manhuntCmd.hunters.contains(event.getEntity().getUniqueId())) {
+            for (Entity e: event.getEntity().getWorld().getEntities()) {
+                if (e instanceof Item && ((Item) e).getItemStack().equals(manhuntCmd.trackerCompass)) {
+                    e.remove();
+                }
+            }
+        }
+    }
+
 }
 
 /*@EventHandler
