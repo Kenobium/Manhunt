@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -109,6 +110,13 @@ public class DurverPlugin extends JavaPlugin implements Listener {
 
             manhuntCmd.trackerCompass.setItemMeta(trackerMeta);
 
+        }
+    }
+
+    @EventHandler
+    public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
+        if (manhuntCmd.manhuntOngoing && manhuntCmd.hunters.contains(event.getPlayer().getUniqueId())) {
+            event.getPlayer().getInventory().addItem(manhuntCmd.trackerCompass);
         }
     }
 }

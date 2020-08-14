@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getPlayer;
-import static org.bukkit.Bukkit.getServer;
 
 public class ManhuntCmd implements CommandExecutor {
 
