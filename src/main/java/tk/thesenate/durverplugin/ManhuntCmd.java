@@ -111,7 +111,7 @@ public class ManhuntCmd implements CommandExecutor {
         Player nearest = null;
         double lastDistance = Double.MAX_VALUE;
         for (Player p : player.getWorld().getPlayers()) {
-            if (player == p)
+            if (player == p || hunters.contains(p.getUniqueId()))
                 continue;
 
             double distance = player.getLocation().distance(p.getLocation());
