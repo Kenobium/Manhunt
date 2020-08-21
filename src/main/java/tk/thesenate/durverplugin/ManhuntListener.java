@@ -1,6 +1,5 @@
 package tk.thesenate.durverplugin;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;

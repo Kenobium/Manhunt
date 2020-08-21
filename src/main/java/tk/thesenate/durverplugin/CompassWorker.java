@@ -13,10 +13,8 @@ import static org.bukkit.Bukkit.getServer;
 public class CompassWorker {
 
     private final ManhuntCmd manhuntCmd = new ManhuntCmd();
-    private final DurverPlugin durverPlugin;
 
     public CompassWorker(DurverPlugin durverPlugin) {
-        this.durverPlugin = durverPlugin;
         durverPlugin.getServer().getScheduler().scheduleSyncRepeatingTask(durverPlugin, () -> {
 
             if (manhuntCmd.manhuntOngoing && getServer().getOnlinePlayers().size() > 1) {
