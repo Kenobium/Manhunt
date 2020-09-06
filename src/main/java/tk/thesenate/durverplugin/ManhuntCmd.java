@@ -17,10 +17,10 @@ import static org.bukkit.Bukkit.getPlayer;
 
 public class ManhuntCmd implements CommandExecutor {
 
-    final ArrayList<UUID> hunters = new ArrayList<>();
-    final ArrayList<UUID> runners = new ArrayList<>();
-    final ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
-    volatile boolean manhuntOngoing = false;
+    static final ArrayList<UUID> hunters = new ArrayList<>();
+    static final ArrayList<UUID> runners = new ArrayList<>();
+    static final ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
+    static volatile boolean manhuntOngoing = false;
 
 
     @Override

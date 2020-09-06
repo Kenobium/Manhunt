@@ -17,11 +17,11 @@ public class CompassWorker {
     public CompassWorker(DurverPlugin durverPlugin) {
         durverPlugin.getServer().getScheduler().scheduleSyncRepeatingTask(durverPlugin, () -> {
 
-            if (manhuntCmd.manhuntOngoing && getServer().getOnlinePlayers().size() > 1) {
-                for (UUID l : manhuntCmd.hunters) {
+            if (ManhuntCmd.manhuntOngoing && getServer().getOnlinePlayers().size() > 1) {
+                for (UUID l : ManhuntCmd.hunters) {
                     Player hunter = getPlayer(l);
                     if (hunter == null) {
-                        manhuntCmd.hunters.remove(l);
+                        ManhuntCmd.hunters.remove(l);
                         continue;
                     }
 
@@ -31,8 +31,8 @@ public class CompassWorker {
 
                     World.Environment trackingDim = ManhuntListener.tracking.getWorld().getEnvironment();
                     World.Environment hunterDim = hunter.getWorld().getEnvironment();
-                    CompassMeta lodestoneTracker = (CompassMeta) manhuntCmd.trackerCompass.getItemMeta();
-                    ItemMeta noPlayers = manhuntCmd.trackerCompass.getItemMeta();
+                    CompassMeta lodestoneTracker = (CompassMeta) ManhuntCmd.trackerCompass.getItemMeta();
+                    ItemMeta noPlayers = ManhuntCmd.trackerCompass.getItemMeta();
                     noPlayers.setDisplayName("No players to track in this dimension");
 
                     if (trackingDim.equals(World.Environment.NORMAL) && hunterDim.equals(World.Environment.NORMAL)) {
@@ -40,9 +40,9 @@ public class CompassWorker {
                     } else if (trackingDim.equals(World.Environment.NETHER) && hunterDim.equals(World.Environment.NETHER)) {
                         lodestoneTracker.setLodestoneTracked(false);
                         lodestoneTracker.setLodestone(ManhuntListener.tracking.getLocation());
-                        manhuntCmd.trackerCompass.setItemMeta(lodestoneTracker);
+                        ManhuntCmd.trackerCompass.setItemMeta(lodestoneTracker);
                     } else {
-                        manhuntCmd.trackerCompass.setItemMeta(noPlayers);
+                        ManhuntCmd.trackerCompass.setItemMeta(noPlayers);
                     }
 
                 }
