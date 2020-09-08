@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getPlayer;
@@ -56,6 +57,7 @@ public class ManhuntCmd implements CommandExecutor {
             } else if (args[0].equalsIgnoreCase("start")) {
                 manhuntOngoing = true;
                 ItemMeta compassName = trackerCompass.getItemMeta();
+                assert compassName != null;
                 compassName.setDisplayName(ChatColor.DARK_PURPLE + "Tracker Compass");
                 trackerCompass.setItemMeta(compassName);
                 for (UUID j : hunters) {
@@ -91,11 +93,11 @@ public class ManhuntCmd implements CommandExecutor {
                 ArrayList<String> huntersList = new ArrayList<>();
                 ArrayList<String> runnersList = new ArrayList<>();
                 for (UUID i: hunters) {
-                    huntersList.add(getPlayer(i).getName());
+                    huntersList.add(Objects.requireNonNull(getPlayer(i)).getName());
                 }
 
                 for (UUID j: runners) {
-                    runnersList.add(getPlayer(j).getName());
+                    runnersList.add(Objects.requireNonNull(getPlayer(j)).getName());
                 }
 
                 sender.sendMessage(huntersList.toString());

@@ -13,8 +13,17 @@ import static org.bukkit.Bukkit.getServer;
 public class CompassWorker {
 
     private final ManhuntCmd manhuntCmd = new ManhuntCmd();
+    static Player tracking;
+    static boolean trackingNearestPlayer = true;
+    World.Environment trackingDim;
+    World.Environment hunterDim;
 
     public CompassWorker(DurverPlugin durverPlugin) {
+
+        ItemMeta noPlayers = ManhuntCmd.trackerCompass.getItemMeta();
+        assert noPlayers != null;
+        noPlayers.setDisplayName("No players to track in this dimension");
+
         durverPlugin.getServer().getScheduler().scheduleSyncRepeatingTask(durverPlugin, () -> {
 
             if (ManhuntCmd.manhuntOngoing && getServer().getOnlinePlayers().size() > 1) {
@@ -25,23 +34,22 @@ public class CompassWorker {
                         continue;
                     }
 
-                    if (ManhuntListener.trackingNearestPlayer) { //!compassManuallySet
-                        ManhuntListener.tracking = manhuntCmd.getNearestPlayer(hunter);
+                    if (trackingNearestPlayer) {
+                        tracking = manhuntCmd.getNearestPlayer(hunter);
                     }
 
-                    World.Environment trackingDim = ManhuntListener.tracking.getWorld().getEnvironment();
-                    World.Environment hunterDim = hunter.getWorld().getEnvironment();
+                    trackingDim = tracking.getWorld().getEnvironment();
+                    hunterDim = hunter.getWorld().getEnvironment();
                     CompassMeta lodestoneTracker = (CompassMeta) ManhuntCmd.trackerCompass.getItemMeta();
-                    ItemMeta noPlayers = ManhuntCmd.trackerCompass.getItemMeta();
-                    noPlayers.setDisplayName("No players to track in this dimension");
 
                     if (trackingDim.equals(World.Environment.NORMAL) && hunterDim.equals(World.Environment.NORMAL)) {
-                        hunter.setCompassTarget(ManhuntListener.tracking.getLocation()); //manhuntCmd.getNearestPlayer(hunter).getLocation()
+                        hunter.setCompassTarget(tracking.getLocation()); 
                     } else if (trackingDim.equals(World.Environment.NETHER) && hunterDim.equals(World.Environment.NETHER)) {
-                        lodestoneTracker.setLodestoneTracked(false);
-                        lodestoneTracker.setLodestone(ManhuntListener.tracking.getLocation());
+                        assert lodestoneTracker != null;
+                        lodestoneTracker.setLodestoneTracked(true);
+                        lodestoneTracker.setLodestone(tracking.getLocation());
                         ManhuntCmd.trackerCompass.setItemMeta(lodestoneTracker);
-                    } else {
+                    } else if ((trackingDim.equals(World.Environment.NORMAL) && hunterDim.equals(World.Environment.NETHER)) || (trackingDim.equals(World.Environment.NETHER) && hunterDim.equals(World.Environment.NORMAL))) {
                         ManhuntCmd.trackerCompass.setItemMeta(noPlayers);
                     }
 

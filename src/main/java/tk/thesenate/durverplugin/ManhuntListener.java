@@ -3,7 +3,6 @@ package tk.thesenate.durverplugin;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -21,8 +20,6 @@ import static org.bukkit.Bukkit.getPlayer;
 public class ManhuntListener implements Listener {
 
     private int currentTargetIndex = -1;
-    static Player tracking;
-    static boolean trackingNearestPlayer = true;
 
     @EventHandler
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
@@ -36,23 +33,20 @@ public class ManhuntListener implements Listener {
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
         if (ManhuntCmd.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), ManhuntCmd.trackerCompass) && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
 
-            //compassManuallySet = true;
-
             if (currentTargetIndex + 1 < ManhuntCmd.runners.size()) {
-                trackingNearestPlayer = false;
-                tracking = getPlayer(ManhuntCmd.runners.get(currentTargetIndex + 1));
+                CompassWorker.trackingNearestPlayer = false;
                 currentTargetIndex++;
+                CompassWorker.tracking = getPlayer(ManhuntCmd.runners.get(currentTargetIndex));
             } else {
-                trackingNearestPlayer = true;
+                CompassWorker.trackingNearestPlayer = true;
                 currentTargetIndex = -1;
-                //compassManuallySet = false;
-                //tracking = manhuntCmd.getNearestPlayer(event.getPlayer());
             }
 
             ItemMeta trackerMeta = ManhuntCmd.trackerCompass.getItemMeta();
+            assert trackerMeta != null;
 
-            if (!trackingNearestPlayer) {
-                trackerMeta.setDisplayName("Tracking " + tracking.getName());
+            if (!CompassWorker.trackingNearestPlayer) {
+                trackerMeta.setDisplayName("Tracking " + CompassWorker.tracking.getName());
             } else {
                 trackerMeta.setDisplayName("Tracking nearest player");
             }
