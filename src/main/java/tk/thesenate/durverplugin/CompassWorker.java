@@ -41,12 +41,11 @@ public class CompassWorker {
                     trackingDim = tracking.getWorld().getEnvironment();
                     hunterDim = hunter.getWorld().getEnvironment();
                     CompassMeta lodestoneTracker = (CompassMeta) ManhuntCmd.trackerCompass.getItemMeta();
+                    lodestoneTracker.setLodestoneTracked(false);
 
                     if (trackingDim.equals(World.Environment.NORMAL) && hunterDim.equals(World.Environment.NORMAL)) {
                         hunter.setCompassTarget(tracking.getLocation()); 
                     } else if (trackingDim.equals(World.Environment.NETHER) && hunterDim.equals(World.Environment.NETHER)) {
-                        assert lodestoneTracker != null;
-                        lodestoneTracker.setLodestoneTracked(true);
                         lodestoneTracker.setLodestone(tracking.getLocation());
                         ManhuntCmd.trackerCompass.setItemMeta(lodestoneTracker);
                     } else if ((trackingDim.equals(World.Environment.NORMAL) && hunterDim.equals(World.Environment.NETHER)) || (trackingDim.equals(World.Environment.NETHER) && hunterDim.equals(World.Environment.NORMAL))) {
