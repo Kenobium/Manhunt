@@ -1,4 +1,4 @@
-package tk.thesenate.durverplugin;
+package tk.thesenate.manhunt;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
@@ -31,22 +31,23 @@ public class ManhuntListener implements Listener {
 
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
+
         if (ManhuntCmd.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), ManhuntCmd.trackerCompass) && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
 
             if (currentTargetIndex + 1 < ManhuntCmd.runners.size()) {
-                CompassWorker.trackingNearestPlayer = false;
+                tk.thesenate.manhunt.CompassWorker.trackingNearestPlayer = false;
                 currentTargetIndex++;
-                CompassWorker.tracking = getPlayer(ManhuntCmd.runners.get(currentTargetIndex));
+                tk.thesenate.manhunt.CompassWorker.tracking = getPlayer(ManhuntCmd.runners.get(currentTargetIndex));
             } else {
-                CompassWorker.trackingNearestPlayer = true;
+                tk.thesenate.manhunt.CompassWorker.trackingNearestPlayer = true;
                 currentTargetIndex = -1;
             }
 
             ItemMeta trackerMeta = ManhuntCmd.trackerCompass.getItemMeta();
             assert trackerMeta != null;
 
-            if (!CompassWorker.trackingNearestPlayer) {
-                trackerMeta.setDisplayName("Tracking " + CompassWorker.tracking.getName());
+            if (!tk.thesenate.manhunt.CompassWorker.trackingNearestPlayer) {
+                trackerMeta.setDisplayName("Tracking " + tk.thesenate.manhunt.CompassWorker.tracking.getName());
             } else {
                 trackerMeta.setDisplayName("Tracking nearest player");
             }
@@ -58,8 +59,8 @@ public class ManhuntListener implements Listener {
             }
 
             ManhuntCmd.trackerCompass.setItemMeta(trackerMeta);
-
         }
+
     }
 
     @EventHandler
@@ -73,7 +74,7 @@ public class ManhuntListener implements Listener {
     @EventHandler
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         if (ManhuntCmd.manhuntOngoing && ManhuntCmd.hunters.contains(event.getEntity().getUniqueId())) {
-            for (Entity e: event.getEntity().getWorld().getEntities()) {
+            for (Entity e : event.getEntity().getWorld().getEntities()) {
                 if (e instanceof Item && ((Item) e).getItemStack().equals(ManhuntCmd.trackerCompass)) {
                     e.remove();
                 }

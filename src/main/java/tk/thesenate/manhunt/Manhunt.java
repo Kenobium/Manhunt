@@ -1,10 +1,10 @@
-package tk.thesenate.durverplugin;
+package tk.thesenate.manhunt;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
-public class DurverPlugin extends JavaPlugin {
+public class Manhunt extends JavaPlugin {
 
     @Override
     public void onEnable() {
@@ -12,7 +12,7 @@ public class DurverPlugin extends JavaPlugin {
         getLogger().info("Durver plugin enabled.");
         getServer().getPluginManager().registerEvents(new ManhuntListener(), this);
         Objects.requireNonNull(getCommand("manhunt")).setExecutor(new ManhuntCmd());
-        new CompassWorker(this);
+        new tk.thesenate.manhunt.CompassWorker(this);
 
     }
 

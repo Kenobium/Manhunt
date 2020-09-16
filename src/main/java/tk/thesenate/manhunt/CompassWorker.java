@@ -1,4 +1,4 @@
-package tk.thesenate.durverplugin;
+package tk.thesenate.manhunt;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -18,13 +18,13 @@ public class CompassWorker {
     World.Environment trackingDim;
     World.Environment hunterDim;
 
-    public CompassWorker(DurverPlugin durverPlugin) {
+    public CompassWorker(Manhunt manhunt) {
 
-        ItemMeta noPlayers = ManhuntCmd.trackerCompass.getItemMeta();
-        assert noPlayers != null;
-        noPlayers.setDisplayName("No players to track in this dimension");
+        ItemMeta noPlayersMeta = ManhuntCmd.trackerCompass.getItemMeta();
+        assert noPlayersMeta != null;
+        noPlayersMeta.setDisplayName("No players to track in this dimension");
 
-        durverPlugin.getServer().getScheduler().scheduleSyncRepeatingTask(durverPlugin, () -> {
+        manhunt.getServer().getScheduler().scheduleSyncRepeatingTask(manhunt, () -> {
 
             if (ManhuntCmd.manhuntOngoing && getServer().getOnlinePlayers().size() > 1) {
                 for (UUID l : ManhuntCmd.hunters) {
@@ -35,7 +35,12 @@ public class CompassWorker {
                     }
 
                     if (trackingNearestPlayer) {
-                        tracking = manhuntCmd.getNearestPlayer(hunter);
+                        try {
+                            tracking = manhuntCmd.getNearestPlayer(hunter);
+                        } catch (NullPointerException e) {
+                            ManhuntCmd.trackerCompass.setItemMeta(noPlayersMeta);
+                        }
+
                     }
 
                     trackingDim = tracking.getWorld().getEnvironment();
@@ -48,9 +53,10 @@ public class CompassWorker {
                     } else if (trackingDim.equals(World.Environment.NETHER) && hunterDim.equals(World.Environment.NETHER)) {
                         lodestoneTracker.setLodestone(tracking.getLocation());
                         ManhuntCmd.trackerCompass.setItemMeta(lodestoneTracker);
-                    } else if ((trackingDim.equals(World.Environment.NORMAL) && hunterDim.equals(World.Environment.NETHER)) || (trackingDim.equals(World.Environment.NETHER) && hunterDim.equals(World.Environment.NORMAL))) {
-                        ManhuntCmd.trackerCompass.setItemMeta(noPlayers);
                     }
+    //                    else if ((trackingDim.equals(World.Environment.NORMAL) && hunterDim.equals(World.Environment.NETHER)) || (trackingDim.equals(World.Environment.NETHER) && hunterDim.equals(World.Environment.NORMAL))) {
+    //                        ManhuntCmd.trackerCompass.setItemMeta(noPlayers);
+    //                    }
 
                 }
             }

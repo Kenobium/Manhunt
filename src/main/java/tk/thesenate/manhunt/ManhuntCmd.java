@@ -1,4 +1,4 @@
-package tk.thesenate.durverplugin;
+package tk.thesenate.manhunt;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
