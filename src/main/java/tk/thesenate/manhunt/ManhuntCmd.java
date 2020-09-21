@@ -1,13 +1,11 @@
 package tk.thesenate.manhunt;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,11 +16,11 @@ import static org.bukkit.Bukkit.getPlayer;
 
 public class ManhuntCmd implements CommandExecutor {
 
-    static final ArrayList<UUID> hunters = new ArrayList<>();
-    static final ArrayList<UUID> runners = new ArrayList<>();
-    static final ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
-    static volatile boolean manhuntOngoing = false;
+    private final ManhuntMgr manhuntMgr;
 
+    public ManhuntCmd(ManhuntMgr manhuntMgr) {
+        this.manhuntMgr = manhuntMgr;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -32,71 +30,71 @@ public class ManhuntCmd implements CommandExecutor {
             // Add hunters
             if (args[0].equalsIgnoreCase("addHunter")) {
 
-                addPlayers(sender, args, hunters);
+                addPlayers(sender, args, manhuntMgr.hunters);
                 return true;
 
                 // Remove hunters
             } else if (args[0].equalsIgnoreCase("removeHunter")) {
 
-                removePlayers(sender, args, hunters);
+                removePlayers(sender, args, manhuntMgr.hunters);
                 return true;
 
                 // Add speedrunners
             } else if (args[0].equalsIgnoreCase("addRunner")) {
 
-                addPlayers(sender, args, runners);
+                addPlayers(sender, args, manhuntMgr.runners);
                 return true;
 
                 // Remove speedrunners
             } else if (args[0].equalsIgnoreCase("removeRunner")) {
 
-                removePlayers(sender, args, runners);
+                removePlayers(sender, args, manhuntMgr.runners);
                 return true;
 
                 // Begin manhunt
             } else if (args[0].equalsIgnoreCase("start")) {
-                manhuntOngoing = true;
-                ItemMeta compassName = trackerCompass.getItemMeta();
-                assert compassName != null;
-                compassName.setDisplayName(ChatColor.DARK_PURPLE + "Tracker Compass");
-                trackerCompass.setItemMeta(compassName);
-                for (UUID j : hunters) {
-                    Player hunter = getPlayer(j);
-                    if (hunter == null) {
-                        hunters.remove(j);
-                        continue;
+                if (!manhuntMgr.manhuntOngoing) {
+                    manhuntMgr.manhuntOngoing = true;
+                    for (UUID j : manhuntMgr.hunters) {
+                        Player hunter = getPlayer(j);
+                        if (hunter == null) {
+                            manhuntMgr.hunters.remove(j);
+                            continue;
+                        }
+                        hunter.getInventory().addItem(manhuntMgr.trackerCompass);
+                        manhuntMgr.trackerMeta.setLodestone(new Location(hunter.getWorld(), 0.0, 0.0, 0.0));
                     }
-                    hunter.getInventory().setItem(0, trackerCompass);
+                } else {
+                    sender.sendMessage(ChatColor.RED + "There is already a game in progress!");
                 }
                 return true;
 
                 // End manhunt
             } else if (args[0].equalsIgnoreCase("stop")) {
-                manhuntOngoing = false;
-                for (UUID k : hunters) {
-                    Player hunter = getPlayer(k);
-                    if (hunter == null) {
-                        hunters.remove(k);
-                        continue;
-                    }
-                    for (int l = 0; l < hunter.getInventory().getSize(); l++) {
-                        if (trackerCompass.equals(hunter.getInventory().getItem(l))) {
-                            hunter.getInventory().setItem(l, new ItemStack(Material.AIR));
-                            break;
+                if (manhuntMgr.manhuntOngoing) {
+                    manhuntMgr.manhuntOngoing = false;
+                    for (UUID k : manhuntMgr.hunters) {
+                        Player hunter = getPlayer(k);
+                        if (hunter == null) {
+                            manhuntMgr.hunters.remove(k);
+                            continue;
                         }
+                        hunter.getInventory().remove(manhuntMgr.trackerCompass);
+                        hunter.setCompassTarget(hunter.getWorld().getSpawnLocation());
                     }
-                    hunter.setCompassTarget(hunter.getWorld().getSpawnLocation());
+                } else {
+                    sender.sendMessage(ChatColor.RED + "There is no game in progress!");
                 }
                 return true;
 
             } else if (args[0].equalsIgnoreCase("list")) {
                 ArrayList<String> huntersList = new ArrayList<>();
                 ArrayList<String> runnersList = new ArrayList<>();
-                for (UUID i: hunters) {
+                for (UUID i : manhuntMgr.hunters) {
                     huntersList.add(Objects.requireNonNull(getPlayer(i)).getName());
                 }
 
-                for (UUID j: runners) {
+                for (UUID j : manhuntMgr.runners) {
                     runnersList.add(Objects.requireNonNull(getPlayer(j)).getName());
                 }
 
@@ -109,28 +107,12 @@ public class ManhuntCmd implements CommandExecutor {
         return false;
     }
 
-    Player getNearestPlayer(Player player) {
-        Player nearest = null;
-        double lastDistance = Double.MAX_VALUE;
-        for (Player p : player.getWorld().getPlayers()) {
-            if (player == p || hunters.contains(p.getUniqueId()))
-                continue;
-
-            double distance = player.getLocation().distance(p.getLocation());
-            if (distance < lastDistance) {
-                lastDistance = distance;
-                nearest = p;
-            }
-        }
-        return nearest;
-    }
-
     private void addPlayers(CommandSender sender, String[] args, ArrayList<UUID> team) {
         String teamName = " ";
 
-        if (team.equals(hunters)) {
+        if (team.equals(manhuntMgr.hunters)) {
             teamName = "'hunters'";
-        } else if (team.equals(runners)) {
+        } else if (team.equals(manhuntMgr.runners)) {
             teamName = "'speedrunners'";
         }
 
@@ -150,9 +132,9 @@ public class ManhuntCmd implements CommandExecutor {
     private void removePlayers(CommandSender sender, String[] args, ArrayList<UUID> team) {
         String teamName = " ";
 
-        if (team.equals(hunters)) {
+        if (team.equals(manhuntMgr.hunters)) {
             teamName = "'hunters'";
-        } else if (team.equals(runners)) {
+        } else if (team.equals(manhuntMgr.runners)) {
             teamName = "'speedrunners'";
         }
 

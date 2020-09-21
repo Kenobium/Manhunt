@@ -21,9 +21,15 @@ public class ManhuntListener implements Listener {
 
     private int currentTargetIndex = -1;
 
+    private final ManhuntMgr manhuntMgr;
+
+    public ManhuntListener(ManhuntMgr manhuntMgr) {
+        this.manhuntMgr = manhuntMgr;
+    }
+
     @EventHandler
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
-        if (ManhuntCmd.manhuntOngoing && event.getItemDrop().getItemStack().equals(ManhuntCmd.trackerCompass) && ManhuntCmd.hunters.contains(event.getPlayer().getUniqueId())) {
+        if (manhuntMgr.manhuntOngoing && event.getItemDrop().getItemStack().equals(manhuntMgr.trackerCompass) && manhuntMgr.hunters.contains(event.getPlayer().getUniqueId())) {
             event.getPlayer().sendMessage(ChatColor.BLUE + "You dropped this");
             event.setCancelled(true);
         }
@@ -32,50 +38,52 @@ public class ManhuntListener implements Listener {
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
 
-        if (ManhuntCmd.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), ManhuntCmd.trackerCompass) && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
+        event.getPlayer().sendMessage(String.valueOf(Objects.equals(event.getItem(), manhuntMgr.trackerCompass)));
 
-            if (currentTargetIndex + 1 < ManhuntCmd.runners.size()) {
-                tk.thesenate.manhunt.CompassWorker.trackingNearestPlayer = false;
+        if (manhuntMgr.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), manhuntMgr.trackerCompass) && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
+            if (currentTargetIndex + 1 < manhuntMgr.runners.size()) {
+                manhuntMgr.trackingNearestPlayer = false;
                 currentTargetIndex++;
-                tk.thesenate.manhunt.CompassWorker.tracking = getPlayer(ManhuntCmd.runners.get(currentTargetIndex));
+                manhuntMgr.tracking = getPlayer(manhuntMgr.runners.get(currentTargetIndex));
             } else {
-                tk.thesenate.manhunt.CompassWorker.trackingNearestPlayer = true;
+                manhuntMgr.trackingNearestPlayer = true;
                 currentTargetIndex = -1;
             }
 
-            ItemMeta trackerMeta = ManhuntCmd.trackerCompass.getItemMeta();
-            assert trackerMeta != null;
-
-            if (!tk.thesenate.manhunt.CompassWorker.trackingNearestPlayer) {
-                trackerMeta.setDisplayName("Tracking " + tk.thesenate.manhunt.CompassWorker.tracking.getName());
-            } else {
-                trackerMeta.setDisplayName("Tracking nearest player");
+            if (manhuntMgr.getNearestPlayer(event.getPlayer()) == null) {
+                manhuntMgr.trackingNearestPlayer = false;
+                manhuntMgr.trackerMeta.setDisplayName(ChatColor.RED + "No players to track in this dimension!");
+            } else if (!manhuntMgr.trackingNearestPlayer) {
+                manhuntMgr.trackerMeta.setDisplayName(ChatColor.GREEN + "Tracking " + manhuntMgr.tracking.getName());
+            } else {    
+                manhuntMgr.trackerMeta.setDisplayName(ChatColor.GREEN + "Tracking nearest player");
             }
 
-            if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
-                event.getPlayer().getInventory().getItemInMainHand().setItemMeta(trackerMeta);
+            /*if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
+                event.getPlayer().getInventory().getItemInMainHand().setItemMeta(manhuntMgr.trackerMeta);
             } else if (Objects.equals(event.getHand(), EquipmentSlot.OFF_HAND)) {
-                event.getPlayer().getInventory().getItemInOffHand().setItemMeta(trackerMeta);
-            }
+                event.getPlayer().getInventory().getItemInOffHand().setItemMeta(manhuntMgr.trackerMeta);
+            }*/
 
-            ManhuntCmd.trackerCompass.setItemMeta(trackerMeta);
+            manhuntMgr.trackerCompass.setItemMeta(manhuntMgr.trackerMeta);
+            event.getPlayer().updateInventory();
         }
 
     }
 
     @EventHandler
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
-        if (ManhuntCmd.manhuntOngoing && ManhuntCmd.hunters.contains(event.getPlayer().getUniqueId())) {
-            event.getPlayer().getInventory().addItem(ManhuntCmd.trackerCompass);
+        if (manhuntMgr.manhuntOngoing && manhuntMgr.hunters.contains(event.getPlayer().getUniqueId())) {
+            event.getPlayer().getInventory().addItem(manhuntMgr.trackerCompass);
 
         }
     }
 
     @EventHandler
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
-        if (ManhuntCmd.manhuntOngoing && ManhuntCmd.hunters.contains(event.getEntity().getUniqueId())) {
+        if (manhuntMgr.manhuntOngoing && manhuntMgr.hunters.contains(event.getEntity().getUniqueId())) {
             for (Entity e : event.getEntity().getWorld().getEntities()) {
-                if (e instanceof Item && ((Item) e).getItemStack().equals(ManhuntCmd.trackerCompass)) {
+                if (e instanceof Item && ((Item) e).getItemStack().equals(manhuntMgr.trackerCompass)) {
                     e.remove();
                 }
             }

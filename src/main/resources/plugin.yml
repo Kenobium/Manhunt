@@ -1,7 +1,7 @@
-name: DurverPlugin
-description: A multi-purpose plugin custom-made for the Durver.
+name: Manhunt
+description: A manhunt plugin.
 version: '0.1.2'
-main: tk.thesenate.durverplugin.DurverPlugin
+main: tk.thesenate.manhunt.Manhunt
 api-version: '1.16'
 commands:
   manhunt:
@@ -12,7 +12,7 @@ commands:
     permission: durver.manhunt
 permissions:
   durver.*:
-    description: Gives access to all DurverPlugin commands.
+    description: Gives access to all Manhunt commands.
     children:
       durver.manhunt: true
   durver.manhunt:

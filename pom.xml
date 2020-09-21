@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>tk.thesenate</groupId>
-    <artifactId>DurverPlugin</artifactId>
+    <artifactId>Manhunt</artifactId>
     <version>0.1-SNAPSHOT</version>
 
     <build>
