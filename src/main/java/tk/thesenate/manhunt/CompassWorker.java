@@ -37,9 +37,10 @@ public class CompassWorker {
                         }
                     }
                     //compassPos = Arrays.asList(hunter.getInventory().getContents()).indexOf(Material.COMPASS);
-                    manhuntMgr.metas.get(index).setLodestone(manhuntMgr.tracking.get(index).getLocation());
-                    manhuntMgr.compasses.get(index).setItemMeta(manhuntMgr.metas.get(index));
-                    System.out.println(compassPos);
+                    if (manhuntMgr.tracking.get(index) != null) {
+                        manhuntMgr.metas.get(index).setLodestone(manhuntMgr.tracking.get(index).getLocation());
+                        manhuntMgr.compasses.get(index).setItemMeta(manhuntMgr.metas.get(index));
+                    }
                     if (compassPos != -1) {
                         hunter.getInventory().setItem(compassPos, manhuntMgr.compasses.get(index));
                         //hunter.getInventory().getItem(compassPos).setItemMeta(manhuntMgr.metas.get(index));

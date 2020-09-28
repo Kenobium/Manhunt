@@ -1,12 +1,14 @@
 package tk.thesenate.manhunt;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -70,8 +72,10 @@ public class ManhuntListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryDragEvent (InventoryDragEvent event) {
-        CompassWorker.compassPos = -1;
+    public void onInventoryClickEvent (InventoryClickEvent event) {
+        if (event.getCurrentItem().getType().equals(Material.COMPASS)) {
+            CompassWorker.compassPos = -1;
+        }
     }
 
     @EventHandler
