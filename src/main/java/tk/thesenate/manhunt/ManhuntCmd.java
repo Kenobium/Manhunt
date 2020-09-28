@@ -2,25 +2,25 @@ package tk.thesenate.manhunt;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.bukkit.Bukkit.getLogger;
 import static org.bukkit.Bukkit.getPlayer;
 
 public class ManhuntCmd implements CommandExecutor {
 
-    private final ManhuntMgr manhuntMgr;
-
-    public ManhuntCmd(ManhuntMgr manhuntMgr) {
-        this.manhuntMgr = manhuntMgr;
-    }
+    private final ManhuntMgr manhuntMgr = ManhuntMgr.getInstance();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -61,9 +61,27 @@ public class ManhuntCmd implements CommandExecutor {
                             manhuntMgr.hunters.remove(j);
                             continue;
                         }
-                        hunter.getInventory().addItem(manhuntMgr.trackerCompass);
-                        manhuntMgr.trackerMeta.setLodestone(new Location(hunter.getWorld(), 0.0, 0.0, 0.0));
+                        ItemStack i = new ItemStack(Material.COMPASS, 1);
+                        CompassMeta im = (CompassMeta) i.getItemMeta();
+                        im.setDisplayName(ChatColor.DARK_PURPLE + "Right click to set");
+                        im.setLodestoneTracked(false);
+                        im.setLodestone(new Location(hunter.getWorld(), 0.0, 0.0, 0.0));
+                        i.setItemMeta(im);
+                        hunter.getInventory().addItem(i);
+                        manhuntMgr.compasses.add(i);
+                        manhuntMgr.metas.add(im);
+                        manhuntMgr.trackingNearestPlayer.add(true);
+
+                        sender.sendMessage(manhuntMgr.compasses.toString());
+                        sender.sendMessage(manhuntMgr.metas.toString());
+                        sender.sendMessage(manhuntMgr.trackingNearestPlayer.toString());
                     }
+                    manhuntMgr.tracking = new ArrayList<>(Arrays.asList(new Player[manhuntMgr.runners.size()]));
+                    /*for (int k = 0; k < manhuntMgr.hunters.size(); k++) {
+                        Player hunter = getPlayer(manhuntMgr.hunters.get(k));
+                        hunter.getInventory().addItem((manhuntMgr.compasses.get(k)));
+
+                    }*/
                 } else {
                     sender.sendMessage(ChatColor.RED + "There is already a game in progress!");
                 }
@@ -73,14 +91,13 @@ public class ManhuntCmd implements CommandExecutor {
             } else if (args[0].equalsIgnoreCase("stop")) {
                 if (manhuntMgr.manhuntOngoing) {
                     manhuntMgr.manhuntOngoing = false;
-                    for (UUID k : manhuntMgr.hunters) {
-                        Player hunter = getPlayer(k);
+                    for (int k = 0; k < manhuntMgr.hunters.size(); k++) {
+                        Player hunter = getPlayer(manhuntMgr.hunters.get(k));
                         if (hunter == null) {
                             manhuntMgr.hunters.remove(k);
                             continue;
                         }
-                        hunter.getInventory().remove(manhuntMgr.trackerCompass);
-                        hunter.setCompassTarget(hunter.getWorld().getSpawnLocation());
+                        hunter.getInventory().remove(manhuntMgr.compasses.get(k));
                     }
                 } else {
                     sender.sendMessage(ChatColor.RED + "There is no game in progress!");
@@ -91,11 +108,11 @@ public class ManhuntCmd implements CommandExecutor {
                 ArrayList<String> huntersList = new ArrayList<>();
                 ArrayList<String> runnersList = new ArrayList<>();
                 for (UUID i : manhuntMgr.hunters) {
-                    huntersList.add(Objects.requireNonNull(getPlayer(i)).getName());
+                    huntersList.add(getPlayer(i).getName());
                 }
 
                 for (UUID j : manhuntMgr.runners) {
-                    runnersList.add(Objects.requireNonNull(getPlayer(j)).getName());
+                    runnersList.add(getPlayer(j).getName());
                 }
 
                 sender.sendMessage(huntersList.toString());

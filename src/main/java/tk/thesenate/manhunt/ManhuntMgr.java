@@ -1,7 +1,5 @@
 package tk.thesenate.manhunt;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
@@ -10,18 +8,29 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class ManhuntMgr {
+
     final ArrayList<UUID> hunters = new ArrayList<>();
     final ArrayList<UUID> runners = new ArrayList<>();
-    final ItemStack trackerCompass = new ItemStack(Material.COMPASS, 1);
-    final CompassMeta trackerMeta = (CompassMeta) trackerCompass.getItemMeta();
-    Player tracking;
-    boolean trackingNearestPlayer = true;
-    volatile boolean manhuntOngoing = false;
+    final ArrayList<ItemStack> compasses = new ArrayList<>();
+    final ArrayList<CompassMeta> metas = new ArrayList<>();
+    ArrayList<Player> tracking = new ArrayList<>();
+    final ArrayList<Boolean> trackingNearestPlayer = new ArrayList<>();
+    boolean manhuntOngoing = false;
+    private static final ManhuntMgr instance = new ManhuntMgr();
 
-    public ManhuntMgr() {
-        trackerMeta.setDisplayName(ChatColor.DARK_PURPLE + "Right click to set");
-        trackerMeta.setLodestoneTracked(false);
-        trackerCompass.setItemMeta(trackerMeta);
+    private ManhuntMgr() {
+        /*for (CompassMeta c : trackerMeta) {
+            c.setDisplayName(ChatColor.DARK_PURPLE + "Right click to set");
+            c.setLodestoneTracked(false);
+        }
+        for (int i = 0; i < trackerCompass.size(); i++) {
+            trackerCompass.get(i).setItemMeta(trackerMeta.get(i));
+        }*/
+
+    }
+
+    public static ManhuntMgr getInstance() {
+        return instance;
     }
 
     Player getNearestPlayer(Player player) {

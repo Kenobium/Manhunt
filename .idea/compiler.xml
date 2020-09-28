@@ -3,8 +3,8 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile name="Annotation profile for Manhunt" enabled="true">
-        <sourceOutputDir name="../../Documents/TheSenate2/hunt/plugins/generated-sources/annotations" />
-        <sourceTestOutputDir name="../../Documents/TheSenate2/hunt/plugins/generated-test-sources/test-annotations" />
+        <sourceOutputDir name="../../Documents/TheSenate/hunt/plugins/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../Documents/TheSenate/hunt/plugins/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Manhunt" />
         <module name="DurverPlugin" />
