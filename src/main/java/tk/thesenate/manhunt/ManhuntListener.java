@@ -7,9 +7,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.meta.CompassMeta;
 
 import java.util.Objects;
 
@@ -64,6 +67,11 @@ public class ManhuntListener implements Listener {
             event.getPlayer().updateInventory();
         }
 
+    }
+
+    @EventHandler
+    public void onInventoryDragEvent (InventoryDragEvent event) {
+        CompassWorker.compassPos = -1;
     }
 
     @EventHandler

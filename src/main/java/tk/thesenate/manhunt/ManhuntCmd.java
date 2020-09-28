@@ -72,9 +72,6 @@ public class ManhuntCmd implements CommandExecutor {
                         manhuntMgr.metas.add(im);
                         manhuntMgr.trackingNearestPlayer.add(true);
 
-                        sender.sendMessage(manhuntMgr.compasses.toString());
-                        sender.sendMessage(manhuntMgr.metas.toString());
-                        sender.sendMessage(manhuntMgr.trackingNearestPlayer.toString());
                     }
                     manhuntMgr.tracking = new ArrayList<>(Arrays.asList(new Player[manhuntMgr.runners.size()]));
                     /*for (int k = 0; k < manhuntMgr.hunters.size(); k++) {
@@ -98,6 +95,10 @@ public class ManhuntCmd implements CommandExecutor {
                             continue;
                         }
                         hunter.getInventory().remove(manhuntMgr.compasses.get(k));
+                        manhuntMgr.compasses.clear();
+                        manhuntMgr.metas.clear();
+                        manhuntMgr.trackingNearestPlayer.clear();
+                        manhuntMgr.tracking.clear();
                     }
                 } else {
                     sender.sendMessage(ChatColor.RED + "There is no game in progress!");
