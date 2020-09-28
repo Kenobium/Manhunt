@@ -1,15 +1,12 @@
 name: Manhunt
 description: A manhunt plugin.
-version: '0.1.2'
+version: '0.1.3'
 main: tk.thesenate.manhunt.Manhunt
 api-version: '1.16'
 commands:
   manhunt:
     description: Add or remove hunters, and start a manhunt game.
-    usage: >
-      Usage is /manhunt <addHunter/removeHunter> <players>
-      then /manhunt <start/stop>
-    permission: durver.manhunt
+    permission: manhunt.manhunt
 permissions:
   durver.*:
     description: Gives access to all Manhunt commands.

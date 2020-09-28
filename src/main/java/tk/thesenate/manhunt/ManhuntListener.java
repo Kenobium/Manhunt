@@ -59,12 +59,6 @@ public class ManhuntListener implements Listener {
                 }
             }
 
-            /*if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
-                event.getPlayer().getInventory().getItemInMainHand().setItemMeta(manhuntMgr.trackerMeta);
-            } else if (Objects.equals(event.getHand(), EquipmentSlot.OFF_HAND)) {
-                event.getPlayer().getInventory().getItemInOffHand().setItemMeta(manhuntMgr.trackerMeta);
-            }*/
-
             manhuntMgr.compasses.get(playerIndex).setItemMeta(manhuntMgr.metas.get(playerIndex));
             event.getPlayer().updateInventory();
         }

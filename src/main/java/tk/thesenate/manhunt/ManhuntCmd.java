@@ -12,10 +12,9 @@ import org.bukkit.inventory.meta.CompassMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.UUID;
 
-import static org.bukkit.Bukkit.getLogger;
+import static org.bukkit.Bukkit.broadcastMessage;
 import static org.bukkit.Bukkit.getPlayer;
 
 public class ManhuntCmd implements CommandExecutor {
@@ -27,99 +26,103 @@ public class ManhuntCmd implements CommandExecutor {
 
         // "Manhunt" command
         if (command.getName().equalsIgnoreCase("manhunt")) {
-            // Add hunters
-            if (args[0].equalsIgnoreCase("addHunter")) {
+            if (args.length == 0) {
+                sendUsage(sender);
+            } else {
+                // Add hunters
+                if (args[0].equalsIgnoreCase("addHunter")) {
 
-                addPlayers(sender, args, manhuntMgr.hunters);
-                return true;
+                    addPlayers(sender, args, manhuntMgr.hunters);
+                    return true;
 
-                // Remove hunters
-            } else if (args[0].equalsIgnoreCase("removeHunter")) {
+                    // Remove hunters
+                } else if (args[0].equalsIgnoreCase("removeHunter")) {
 
-                removePlayers(sender, args, manhuntMgr.hunters);
-                return true;
+                    removePlayers(sender, args, manhuntMgr.hunters);
+                    return true;
 
-                // Add speedrunners
-            } else if (args[0].equalsIgnoreCase("addRunner")) {
+                    // Add speedrunners
+                } else if (args[0].equalsIgnoreCase("addRunner")) {
 
-                addPlayers(sender, args, manhuntMgr.runners);
-                return true;
+                    addPlayers(sender, args, manhuntMgr.runners);
+                    return true;
 
-                // Remove speedrunners
-            } else if (args[0].equalsIgnoreCase("removeRunner")) {
+                    // Remove speedrunners
+                } else if (args[0].equalsIgnoreCase("removeRunner")) {
 
-                removePlayers(sender, args, manhuntMgr.runners);
-                return true;
+                    removePlayers(sender, args, manhuntMgr.runners);
+                    return true;
 
-                // Begin manhunt
-            } else if (args[0].equalsIgnoreCase("start")) {
-                if (!manhuntMgr.manhuntOngoing) {
-                    manhuntMgr.manhuntOngoing = true;
-                    for (UUID j : manhuntMgr.hunters) {
-                        Player hunter = getPlayer(j);
-                        if (hunter == null) {
-                            manhuntMgr.hunters.remove(j);
-                            continue;
+                    // Begin manhunt
+                } else if (args[0].equalsIgnoreCase("start")) {
+                    if (!manhuntMgr.manhuntOngoing) {
+                        manhuntMgr.manhuntOngoing = true;
+                        for (UUID j : manhuntMgr.hunters) {
+                            Player hunter = getPlayer(j);
+                            if (hunter == null) {
+                                manhuntMgr.hunters.remove(j);
+                                continue;
+                            }
+                            ItemStack i = new ItemStack(Material.COMPASS, 1);
+                            CompassMeta im = (CompassMeta) i.getItemMeta();
+                            im.setDisplayName(ChatColor.DARK_PURPLE + "Right click to set");
+                            im.setLodestoneTracked(false);
+                            im.setLodestone(new Location(hunter.getWorld(), 0.0, 0.0, 0.0));
+                            i.setItemMeta(im);
+                            hunter.getInventory().addItem(i);
+                            manhuntMgr.compasses.add(i);
+                            manhuntMgr.metas.add(im);
+                            manhuntMgr.trackingNearestPlayer.add(true);
+
                         }
-                        ItemStack i = new ItemStack(Material.COMPASS, 1);
-                        CompassMeta im = (CompassMeta) i.getItemMeta();
-                        im.setDisplayName(ChatColor.DARK_PURPLE + "Right click to set");
-                        im.setLodestoneTracked(false);
-                        im.setLodestone(new Location(hunter.getWorld(), 0.0, 0.0, 0.0));
-                        i.setItemMeta(im);
-                        hunter.getInventory().addItem(i);
-                        manhuntMgr.compasses.add(i);
-                        manhuntMgr.metas.add(im);
-                        manhuntMgr.trackingNearestPlayer.add(true);
+                        manhuntMgr.tracking = new ArrayList<>(Arrays.asList(new Player[manhuntMgr.runners.size()]));
+                        broadcastMessage(ChatColor.GREEN + "Manhunt game started!");
 
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "There is already a game in progress!");
                     }
-                    manhuntMgr.tracking = new ArrayList<>(Arrays.asList(new Player[manhuntMgr.runners.size()]));
-                    /*for (int k = 0; k < manhuntMgr.hunters.size(); k++) {
-                        Player hunter = getPlayer(manhuntMgr.hunters.get(k));
-                        hunter.getInventory().addItem((manhuntMgr.compasses.get(k)));
+                    return true;
 
-                    }*/
-                } else {
-                    sender.sendMessage(ChatColor.RED + "There is already a game in progress!");
-                }
-                return true;
-
-                // End manhunt
-            } else if (args[0].equalsIgnoreCase("stop")) {
-                if (manhuntMgr.manhuntOngoing) {
-                    manhuntMgr.manhuntOngoing = false;
-                    for (int k = 0; k < manhuntMgr.hunters.size(); k++) {
-                        Player hunter = getPlayer(manhuntMgr.hunters.get(k));
-                        if (hunter == null) {
-                            manhuntMgr.hunters.remove(k);
-                            continue;
+                    // End manhunt
+                } else if (args[0].equalsIgnoreCase("stop")) {
+                    if (manhuntMgr.manhuntOngoing) {
+                        manhuntMgr.manhuntOngoing = false;
+                        for (int k = 0; k < manhuntMgr.hunters.size(); k++) {
+                            Player hunter = getPlayer(manhuntMgr.hunters.get(k));
+                            if (hunter == null) {
+                                manhuntMgr.hunters.remove(k);
+                                continue;
+                            }
+                            hunter.getInventory().remove(manhuntMgr.compasses.get(k));
+                            manhuntMgr.compasses.clear();
+                            manhuntMgr.metas.clear();
+                            manhuntMgr.trackingNearestPlayer.clear();
+                            manhuntMgr.tracking.clear();
                         }
-                        hunter.getInventory().remove(manhuntMgr.compasses.get(k));
-                        manhuntMgr.compasses.clear();
-                        manhuntMgr.metas.clear();
-                        manhuntMgr.trackingNearestPlayer.clear();
-                        manhuntMgr.tracking.clear();
+                        broadcastMessage(ChatColor.GREEN + "Manhunt game ended.");
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "There is no game in progress!");
                     }
+                    return true;
+
+                } else if (args[0].equalsIgnoreCase("list")) {
+                    ArrayList<String> huntersList = new ArrayList<>();
+                    ArrayList<String> runnersList = new ArrayList<>();
+                    for (UUID i : manhuntMgr.hunters) {
+                        huntersList.add(getPlayer(i).getName());
+                    }
+
+                    for (UUID j : manhuntMgr.runners) {
+                        runnersList.add(getPlayer(j).getName());
+                    }
+
+                    sender.sendMessage(huntersList.toString());
+                    sender.sendMessage(runnersList.toString());
+                    return true;
+
                 } else {
-                    sender.sendMessage(ChatColor.RED + "There is no game in progress!");
+                    sendUsage(sender);
                 }
-                return true;
-
-            } else if (args[0].equalsIgnoreCase("list")) {
-                ArrayList<String> huntersList = new ArrayList<>();
-                ArrayList<String> runnersList = new ArrayList<>();
-                for (UUID i : manhuntMgr.hunters) {
-                    huntersList.add(getPlayer(i).getName());
-                }
-
-                for (UUID j : manhuntMgr.runners) {
-                    runnersList.add(getPlayer(j).getName());
-                }
-
-                sender.sendMessage(huntersList.toString());
-                sender.sendMessage(runnersList.toString());
-                return true;
-
             }
         }
         return false;
@@ -167,5 +170,9 @@ public class ManhuntCmd implements CommandExecutor {
                 sender.sendMessage(ChatColor.GREEN + "Player removed from team " + teamName + ".");
             }
         }
+    }
+
+    private void sendUsage(CommandSender sender) {
+        sender.sendMessage(ChatColor.RED + "Usage: /manhunt <start/stop/(add/remove)(hunter/runner)> <players>");
     }
 }

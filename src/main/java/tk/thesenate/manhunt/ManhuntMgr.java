@@ -19,13 +19,6 @@ public class ManhuntMgr {
     private static final ManhuntMgr instance = new ManhuntMgr();
 
     private ManhuntMgr() {
-        /*for (CompassMeta c : trackerMeta) {
-            c.setDisplayName(ChatColor.DARK_PURPLE + "Right click to set");
-            c.setLodestoneTracked(false);
-        }
-        for (int i = 0; i < trackerCompass.size(); i++) {
-            trackerCompass.get(i).setItemMeta(trackerMeta.get(i));
-        }*/
 
     }
 
