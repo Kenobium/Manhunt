@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.CompassMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.broadcastMessage;
@@ -106,8 +107,8 @@ public class ManhuntCmd implements CommandExecutor {
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("list")) {
-                    ArrayList<String> huntersList = new ArrayList<>();
-                    ArrayList<String> runnersList = new ArrayList<>();
+                    List<String> huntersList = new ArrayList<>();
+                    List<String> runnersList = new ArrayList<>();
                     for (UUID i : manhuntMgr.hunters) {
                         huntersList.add(getPlayer(i).getName());
                     }
@@ -116,8 +117,8 @@ public class ManhuntCmd implements CommandExecutor {
                         runnersList.add(getPlayer(j).getName());
                     }
 
-                    sender.sendMessage(huntersList.toString());
-                    sender.sendMessage(runnersList.toString());
+                    sender.sendMessage(ChatColor.RED + "Hunters: " + String.join(", ", huntersList));
+                    sender.sendMessage(ChatColor.GREEN + "Speedrunners: " + String.join(", ", runnersList));
                     return true;
 
                 } else {
