@@ -8,10 +8,10 @@ commands:
     description: Add or remove hunters, and start a manhunt game.
     permission: manhunt.manhunt
 permissions:
-  durver.*:
+  manhunt.*:
     description: Gives access to all Manhunt commands.
     children:
-      durver.manhunt: true
-  durver.manhunt:
+      manhunt.manhunt: true
+  manhunt.manhunt:
     description: Gives access to manhunt command.
     default: op
