@@ -11,6 +11,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.Objects;
@@ -87,6 +88,16 @@ public class ManhuntListener implements Listener {
                     e.remove();
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+        manhuntMgr.hunters.remove(event.getPlayer().getUniqueId());
+        manhuntMgr.runners.remove(event.getPlayer().getUniqueId());
+        if (manhuntMgr.hunters.contains(event.getPlayer().getUniqueId())) {
+            manhuntMgr.trackingNearestPlayer.remove(manhuntMgr.trackingNearestPlayer.size() - 1);
+            manhuntMgr.tracking.remove(manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId()));
         }
     }
 
