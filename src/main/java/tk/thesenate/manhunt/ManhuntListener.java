@@ -2,6 +2,7 @@ package tk.thesenate.manhunt;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
@@ -36,7 +37,7 @@ public class ManhuntListener implements Listener {
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
 
         int playerIndex = manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId());
-        if (manhuntMgr.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), manhuntMgr.compasses.get(playerIndex)) && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
+        if (manhuntMgr.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), manhuntMgr.compasses.get(playerIndex)) && playerIndex != -1 && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
             if (currentTargetIndex + 1 < manhuntMgr.runners.size()) {
                 manhuntMgr.trackingNearestPlayer.set(playerIndex, false);
                 currentTargetIndex++;
@@ -51,14 +52,19 @@ public class ManhuntListener implements Listener {
                 manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.RED + "No players to track in this dimension!");
             } else {
                 if (!manhuntMgr.trackingNearestPlayer.get(playerIndex)) {
-                    manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GREEN + "Tracking " + manhuntMgr.tracking.get(playerIndex).getName());
+                    World.Environment hunterDim = event.getPlayer().getWorld().getEnvironment();
+                    World.Environment trackingDim = manhuntMgr.tracking.get(playerIndex).getWorld().getEnvironment();
+                    if (hunterDim.equals(trackingDim)) {
+                        manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GREEN + "Tracking " + manhuntMgr.tracking.get(playerIndex).getName());
+                    } else {
+                        manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GOLD + manhuntMgr.tracking.get(playerIndex).getName() + " is not in this dimension");
+                    }
                 } else {
                     manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GREEN + "Tracking nearest player");
                 }
             }
 
             manhuntMgr.compasses.get(playerIndex).setItemMeta(manhuntMgr.metas.get(playerIndex));
-            event.getPlayer().updateInventory();
         }
 
     }
@@ -96,8 +102,11 @@ public class ManhuntListener implements Listener {
         manhuntMgr.hunters.remove(event.getPlayer().getUniqueId());
         manhuntMgr.runners.remove(event.getPlayer().getUniqueId());
         if (manhuntMgr.hunters.contains(event.getPlayer().getUniqueId())) {
+            int playerIndex = manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId());
             manhuntMgr.trackingNearestPlayer.remove(manhuntMgr.trackingNearestPlayer.size() - 1);
-            manhuntMgr.tracking.remove(manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId()));
+            manhuntMgr.tracking.remove(playerIndex);
+            manhuntMgr.compasses.remove(playerIndex);
+            manhuntMgr.metas.remove(playerIndex);
         }
     }
 
