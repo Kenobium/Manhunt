@@ -1,4 +1,4 @@
-package tk.thesenate.durverplugin;
+package tk.thesenate.manhunt;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,20 +20,17 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getPlayer;
-import static org.bukkit.Bukkit.getServerIcon;
 
-public class DurverPlugin extends JavaPlugin implements Listener {
+public class Manhunt extends JavaPlugin implements Listener {
 
     ManhuntCmd manhuntCmd = new ManhuntCmd();
     Player tracking;
-    //boolean compassManuallySet = false;
     boolean trackingNearestPlayer = true;
     int currentTargetIndex = -1;
 
 
     @Override
     public void onEnable() {
-        getLogger().info("Durver plugin enabled.");
         getCommand("manhunt").setExecutor(manhuntCmd);
         getServer().getPluginManager().registerEvents(this, this);
 
@@ -47,30 +44,22 @@ public class DurverPlugin extends JavaPlugin implements Listener {
                         continue;
                     }
 
-                    if (trackingNearestPlayer) { //!compassManuallySet
+                    if (trackingNearestPlayer) {
                         tracking = manhuntCmd.getNearestPlayer(hunter);
                     }
 
-                    if (manhuntCmd.runners.contains(tracking.getUniqueId())) { //manhuntCmd.getNearestPlayer(hunter).getUniqueId())
-                        hunter.setCompassTarget(tracking.getLocation()); //manhuntCmd.getNearestPlayer(hunter).getLocation()
+                    if (manhuntCmd.runners.contains(tracking.getUniqueId())) {
+                        hunter.setCompassTarget(tracking.getLocation());
                     }
                 }
             }
         }, 1L, 1L);
 
-        /*Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                Bukkit.getLogger().info(String.valueOf(currentTargetIndex));
-                Bukkit.getLogger().info(String.valueOf(trackingNearestPlayer));
-            }
-
-        }, 250L, 250L);*/
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("Durver plugin disabled.");
+
     }
 
     @EventHandler
@@ -85,8 +74,6 @@ public class DurverPlugin extends JavaPlugin implements Listener {
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
         if (manhuntCmd.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), manhuntCmd.trackerCompass) && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
 
-            //compassManuallySet = true;
-
             if (currentTargetIndex + 1 < manhuntCmd.runners.size()) {
                 trackingNearestPlayer = false;
                 tracking = getPlayer(manhuntCmd.runners.get(currentTargetIndex + 1));
@@ -94,16 +81,16 @@ public class DurverPlugin extends JavaPlugin implements Listener {
             } else {
                 trackingNearestPlayer = true;
                 currentTargetIndex = -1;
-                //compassManuallySet = false;
-                //tracking = manhuntCmd.getNearestPlayer(event.getPlayer());
             }
 
             ItemMeta trackerMeta = manhuntCmd.trackerCompass.getItemMeta();
 
-            if (!trackingNearestPlayer) {
-                trackerMeta.setDisplayName("Tracking " + tracking.getName());
+            if (manhuntCmd.getNearestPlayer(event.getPlayer()) == null){
+                trackerMeta.setDisplayName(ChatColor.RED + "No players to track in this dimension!");
+            } else if (!trackingNearestPlayer) {
+                trackerMeta.setDisplayName(ChatColor.GREEN + "Tracking " + tracking.getName());
             } else {
-                trackerMeta.setDisplayName("Tracking nearest player");
+                trackerMeta.setDisplayName(ChatColor.GREEN + "Tracking nearest player");
             }
 
             if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
@@ -128,7 +115,7 @@ public class DurverPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         if (manhuntCmd.manhuntOngoing && manhuntCmd.hunters.contains(event.getEntity().getUniqueId())) {
-            for (Entity e: event.getEntity().getWorld().getEntities()) {
+            for (Entity e : event.getEntity().getWorld().getEntities()) {
                 if (e instanceof Item && ((Item) e).getItemStack().equals(manhuntCmd.trackerCompass)) {
                     e.remove();
                 }
@@ -137,10 +124,3 @@ public class DurverPlugin extends JavaPlugin implements Listener {
     }
 
 }
-
-/*@EventHandler
-    public void onInventoryClickEvent(InventoryClickEvent event) {
-        if (manhuntCmd.manhuntOngoing && Objects.equals(event.getCurrentItem(), manhuntCmd.trackerCompass)) {
-            event.setCancelled(true);
-        }
-    }*/
