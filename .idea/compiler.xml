@@ -8,6 +8,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="DurverPlugin" />
       </profile>
+      <profile name="Annotation profile for Manhunt" enabled="true">
+        <sourceOutputDir name="../../Documents/TheSenate/hunt/plugins/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../Documents/TheSenate/hunt/plugins/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Manhunt" />
+      </profile>
     </annotationProcessing>
   </component>
 </project>
