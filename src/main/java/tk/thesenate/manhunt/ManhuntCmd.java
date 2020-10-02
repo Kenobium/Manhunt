@@ -26,33 +26,27 @@ public class ManhuntCmd implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        // "Manhunt" command
         if (command.getName().equalsIgnoreCase("manhunt")) {
-            // Add hunters
             if (args[0].equalsIgnoreCase("addHunter")) {
 
                 addPlayers(sender, args, hunters);
                 return true;
 
-                // Remove hunters
             } else if (args[0].equalsIgnoreCase("removeHunter")) {
 
                 removePlayers(sender, args, hunters);
                 return true;
 
-                // Add speedrunners
             } else if (args[0].equalsIgnoreCase("addRunner")) {
 
                 addPlayers(sender, args, runners);
                 return true;
 
-                // Remove speedrunners
             } else if (args[0].equalsIgnoreCase("removeRunner")) {
 
                 removePlayers(sender, args, runners);
                 return true;
 
-                // Begin manhunt
             } else if (args[0].equalsIgnoreCase("start")) {
                 manhuntOngoing = true;
                 ItemMeta compassName = trackerCompass.getItemMeta();
@@ -68,7 +62,6 @@ public class ManhuntCmd implements CommandExecutor {
                 }
                 return true;
 
-                // End manhunt
             } else if (args[0].equalsIgnoreCase("stop")) {
                 manhuntOngoing = false;
                 for (UUID k : hunters) {

@@ -11,6 +11,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -123,4 +124,9 @@ public class Manhunt extends JavaPlugin implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+        manhuntCmd.hunters.remove(event.getPlayer().getUniqueId());
+        manhuntCmd.runners.remove(event.getPlayer().getUniqueId());
+    }
 }
