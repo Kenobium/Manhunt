@@ -25,36 +25,30 @@ public class ManhuntCmd implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        // "Manhunt" command
         if (command.getName().equalsIgnoreCase("manhunt")) {
             if (args.length == 0) {
                 sendUsage(sender);
             } else {
-                // Add hunters
                 if (args[0].equalsIgnoreCase("addHunter")) {
 
-                    addPlayers(sender, args, manhuntMgr.hunters);
+                    addPlayers(sender, args, manhuntMgr.hunters, manhuntMgr.runners);
                     return true;
 
-                    // Remove hunters
                 } else if (args[0].equalsIgnoreCase("removeHunter")) {
 
                     removePlayers(sender, args, manhuntMgr.hunters);
                     return true;
 
-                    // Add speedrunners
                 } else if (args[0].equalsIgnoreCase("addRunner")) {
 
-                    addPlayers(sender, args, manhuntMgr.runners);
+                    addPlayers(sender, args, manhuntMgr.runners, manhuntMgr.hunters);
                     return true;
 
-                    // Remove speedrunners
                 } else if (args[0].equalsIgnoreCase("removeRunner")) {
 
                     removePlayers(sender, args, manhuntMgr.runners);
                     return true;
 
-                    // Begin manhunt
                 } else if (args[0].equalsIgnoreCase("start")) {
                     if (!manhuntMgr.manhuntOngoing) {
                         manhuntMgr.manhuntOngoing = true;
@@ -81,7 +75,6 @@ public class ManhuntCmd implements CommandExecutor {
                     }
                     return true;
 
-                    // End manhunt
                 } else if (args[0].equalsIgnoreCase("stop")) {
                     if (manhuntMgr.manhuntOngoing) {
                         manhuntMgr.manhuntOngoing = false;
@@ -123,8 +116,9 @@ public class ManhuntCmd implements CommandExecutor {
         return false;
     }
 
-    private void addPlayers(CommandSender sender, String[] args, ArrayList<UUID> team) {
-        String teamName = " ";
+    private void addPlayers(CommandSender sender, String[] args, ArrayList<UUID> team, ArrayList<UUID> otherTeam) {
+        String teamName = "";
+        String otherTeamName = "";
 
         if (team.equals(manhuntMgr.hunters)) {
             teamName = "'hunters'";
@@ -132,15 +126,23 @@ public class ManhuntCmd implements CommandExecutor {
             teamName = "'speedrunners'";
         }
 
+        if (otherTeam.equals(manhuntMgr.hunters)) {
+            otherTeamName = "'hunters'";
+        } else if (otherTeam.equals(manhuntMgr.runners)) {
+            otherTeamName = "'speedrunners'";
+        }
+
         for (String i : Arrays.copyOfRange(args, 1, args.length)) {
             Player player = getPlayer(i);
             if (player == null) {
                 sender.sendMessage(ChatColor.RED + "Player not found.");
-            } else if (team.contains(player.getUniqueId())) { // HashSet.add() will return false if contains element. maybe refactor l8r
-                sender.sendMessage(ChatColor.RED + "Player is already on team " + teamName + ".");
+            } else if (team.contains(player.getUniqueId())) {
+                sender.sendMessage(ChatColor.RED + player.getName() + " is already on team " + teamName + ".");
+            } else if (otherTeam.contains(player.getUniqueId())) {
+                sender.sendMessage(ChatColor.RED + player.getName() + " is already on team " + otherTeamName + ".");
             } else {
                 team.add(player.getUniqueId());
-                sender.sendMessage(ChatColor.GREEN + "Player added to team " + teamName + ".");
+                sender.sendMessage(ChatColor.GREEN + player.getName() + " added to team " + teamName + ".");
             }
         }
     }
@@ -159,10 +161,10 @@ public class ManhuntCmd implements CommandExecutor {
             if (player == null) {
                 sender.sendMessage(ChatColor.RED + "Player not found.");
             } else if (!team.contains(player.getUniqueId())) {
-                sender.sendMessage(ChatColor.RED + "Player not found on team " + teamName + ".");
+                sender.sendMessage(ChatColor.RED + player.getName() + " not found on team " + teamName + ".");
             } else {
                 team.remove(player.getUniqueId());
-                sender.sendMessage(ChatColor.GREEN + "Player removed from team " + teamName + ".");
+                sender.sendMessage(ChatColor.GREEN + player.getName() + " removed from team " + teamName + ".");
             }
         }
     }

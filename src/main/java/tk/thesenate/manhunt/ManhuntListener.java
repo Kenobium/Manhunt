@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -22,7 +23,7 @@ import static org.bukkit.Bukkit.getPlayer;
 public class ManhuntListener implements Listener {
 
     private final ManhuntMgr manhuntMgr = ManhuntMgr.getInstance();
-    private int currentTargetIndex = -1;
+    private int targetIndex = -1;
 
     @EventHandler
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
@@ -40,13 +41,13 @@ public class ManhuntListener implements Listener {
 
         if (manhuntMgr.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem().getType(), Material.COMPASS/*manhuntMgr.compasses.get(playerIndex)*/) && playerIndex != -1 && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
             CompassMeta im = (CompassMeta) event.getItem().getItemMeta();
-            if (currentTargetIndex + 1 < manhuntMgr.runners.size()) {
+            if (targetIndex + 1 < manhuntMgr.runners.size()) {
                 manhuntMgr.trackingNearestPlayer.set(playerIndex, false);
-                currentTargetIndex++;
-                manhuntMgr.tracking.set(playerIndex, getPlayer(manhuntMgr.runners.get(currentTargetIndex)));
+                targetIndex++;
+                manhuntMgr.tracking.set(playerIndex, getPlayer(manhuntMgr.runners.get(targetIndex)));
             } else {
                 manhuntMgr.trackingNearestPlayer.set(playerIndex, true);
-                currentTargetIndex = -1;
+                targetIndex = -1;
             }
 
             if (manhuntMgr.getNearestPlayer(event.getPlayer()) == null) {
@@ -125,10 +126,16 @@ public class ManhuntListener implements Listener {
                         inv.setItem(i, new ItemStack(Material.COMPASS));
                     }
                 }
+                manhuntMgr.trackingNearestPlayer.set(manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId()), false);
 
+            } else if (manhuntMgr.runners.contains(event.getPlayer().getUniqueId())) {
+                for (Player p : event.getFrom().getPlayers()) {
+                    if (manhuntMgr.hunters.contains(p.getUniqueId())) {
+                        manhuntMgr.trackingNearestPlayer.set(manhuntMgr.hunters.indexOf(p.getUniqueId()), false);
+                    }
+                }
             }
 
-            manhuntMgr.trackingNearestPlayer.set(manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId()), false);
         }
     }
 
