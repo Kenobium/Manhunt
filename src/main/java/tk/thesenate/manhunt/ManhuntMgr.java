@@ -11,8 +11,6 @@ public class ManhuntMgr {
 
     final ArrayList<UUID> hunters = new ArrayList<>();
     final ArrayList<UUID> runners = new ArrayList<>();
-    final ArrayList<ItemStack> compasses = new ArrayList<>();
-    final ArrayList<CompassMeta> metas = new ArrayList<>();
     ArrayList<Player> tracking = new ArrayList<>();
     final ArrayList<Boolean> trackingNearestPlayer = new ArrayList<>();
     boolean manhuntOngoing = false;

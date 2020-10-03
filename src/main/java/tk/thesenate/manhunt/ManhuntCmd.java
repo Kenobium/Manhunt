@@ -68,11 +68,8 @@ public class ManhuntCmd implements CommandExecutor {
                             CompassMeta im = (CompassMeta) i.getItemMeta();
                             im.setDisplayName(ChatColor.DARK_PURPLE + "Right click to set");
                             im.setLodestoneTracked(false);
-                            im.setLodestone(new Location(hunter.getWorld(), 0.0, 0.0, 0.0));
                             i.setItemMeta(im);
                             hunter.getInventory().addItem(i);
-                            manhuntMgr.compasses.add(i);
-                            manhuntMgr.metas.add(im);
                             manhuntMgr.trackingNearestPlayer.add(true);
 
                         }
@@ -94,9 +91,6 @@ public class ManhuntCmd implements CommandExecutor {
                                 manhuntMgr.hunters.remove(k);
                                 continue;
                             }
-                            hunter.getInventory().remove(manhuntMgr.compasses.get(k));
-                            manhuntMgr.compasses.clear();
-                            manhuntMgr.metas.clear();
                             manhuntMgr.trackingNearestPlayer.clear();
                             manhuntMgr.tracking.clear();
                         }

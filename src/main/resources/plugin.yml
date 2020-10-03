@@ -1,6 +1,6 @@
 name: Manhunt
 description: A manhunt plugin.
-version: '0.1.3'
+version: '1.0'
 main: tk.thesenate.manhunt.Manhunt
 api-version: '1.16'
 commands:

@@ -9,11 +9,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.CompassMeta;
 
 import java.util.Objects;
 
@@ -27,7 +27,7 @@ public class ManhuntListener implements Listener {
     @EventHandler
     public void onPlayerDropItemEvent(PlayerDropItemEvent event) {
         int playerIndex = manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId());
-        if (manhuntMgr.manhuntOngoing && event.getItemDrop().getItemStack().equals(manhuntMgr.compasses.get(playerIndex)) && manhuntMgr.hunters.contains(event.getPlayer().getUniqueId())) {
+        if (manhuntMgr.manhuntOngoing && event.getItemDrop().getItemStack().getType().equals(Material.COMPASS) && manhuntMgr.hunters.contains(event.getPlayer().getUniqueId())) {
             event.getPlayer().sendMessage(ChatColor.BLUE + "You dropped this");
             event.setCancelled(true);
         }
@@ -37,7 +37,9 @@ public class ManhuntListener implements Listener {
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
 
         int playerIndex = manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId());
-        if (manhuntMgr.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem(), manhuntMgr.compasses.get(playerIndex)) && playerIndex != -1 && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
+
+        if (manhuntMgr.manhuntOngoing && event.hasItem() && Objects.equals(event.getItem().getType(), Material.COMPASS/*manhuntMgr.compasses.get(playerIndex)*/) && playerIndex != -1 && (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
+            CompassMeta im = (CompassMeta) event.getItem().getItemMeta();
             if (currentTargetIndex + 1 < manhuntMgr.runners.size()) {
                 manhuntMgr.trackingNearestPlayer.set(playerIndex, false);
                 currentTargetIndex++;
@@ -49,38 +51,42 @@ public class ManhuntListener implements Listener {
 
             if (manhuntMgr.getNearestPlayer(event.getPlayer()) == null) {
                 manhuntMgr.trackingNearestPlayer.set(playerIndex, false);
-                manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.RED + "No players to track in this dimension!");
+                //manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.RED + "No players to track in this dimension!");
+                im.setDisplayName(ChatColor.RED + "No players to track in this dimension!");
             } else {
                 if (!manhuntMgr.trackingNearestPlayer.get(playerIndex)) {
                     World.Environment hunterDim = event.getPlayer().getWorld().getEnvironment();
                     World.Environment trackingDim = manhuntMgr.tracking.get(playerIndex).getWorld().getEnvironment();
                     if (hunterDim.equals(trackingDim)) {
-                        manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GREEN + "Tracking " + manhuntMgr.tracking.get(playerIndex).getName());
+                        //manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GREEN + "Tracking " + manhuntMgr.tracking.get(playerIndex).getName());
+                        im.setDisplayName(ChatColor.GREEN + "Tracking " + manhuntMgr.tracking.get(playerIndex).getName());
                     } else {
-                        manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GOLD + manhuntMgr.tracking.get(playerIndex).getName() + " is not in this dimension");
+                        //manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GOLD + manhuntMgr.tracking.get(playerIndex).getName() + " is not in this dimension");
+                        im.setDisplayName(ChatColor.GOLD + manhuntMgr.tracking.get(playerIndex).getName() + " is not in this dimension");
                     }
                 } else {
-                    manhuntMgr.metas.get(playerIndex).setDisplayName(ChatColor.GREEN + "Tracking nearest player");
+                    im.setDisplayName(ChatColor.GREEN + "Tracking nearest player");
                 }
             }
 
-            manhuntMgr.compasses.get(playerIndex).setItemMeta(manhuntMgr.metas.get(playerIndex));
+            //manhuntMgr.compasses.get(playerIndex).setItemMeta(manhuntMgr.metas.get(playerIndex));
+            event.getItem().setItemMeta(im);
         }
 
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onInventoryClickEvent (InventoryClickEvent event) {
         if (event.getCurrentItem().getType().equals(Material.COMPASS)) {
             CompassWorker.compassPos = -1;
         }
-    }
+    }*/
 
     @EventHandler
     public void onPlayerRespawnEvent(PlayerRespawnEvent event) {
         int playerIndex = manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId());
         if (manhuntMgr.manhuntOngoing && manhuntMgr.hunters.contains(event.getPlayer().getUniqueId())) {
-            event.getPlayer().getInventory().addItem(manhuntMgr.compasses.get(playerIndex));
+            event.getPlayer().getInventory().addItem(new ItemStack(Material.COMPASS));
 
         }
     }
@@ -90,7 +96,7 @@ public class ManhuntListener implements Listener {
         int playerIndex = manhuntMgr.hunters.indexOf(event.getEntity().getPlayer().getUniqueId());
         if (manhuntMgr.manhuntOngoing && manhuntMgr.hunters.contains(event.getEntity().getUniqueId())) {
             for (Entity e : event.getEntity().getWorld().getEntities()) {
-                if (e instanceof Item && ((Item) e).getItemStack().equals(manhuntMgr.compasses.get(playerIndex))) {
+                if (e instanceof Item && ((Item) e).getItemStack().getType().equals(Material.COMPASS)) {
                     e.remove();
                 }
             }
@@ -105,8 +111,32 @@ public class ManhuntListener implements Listener {
             int playerIndex = manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId());
             manhuntMgr.trackingNearestPlayer.remove(manhuntMgr.trackingNearestPlayer.size() - 1);
             manhuntMgr.tracking.remove(playerIndex);
-            manhuntMgr.compasses.remove(playerIndex);
-            manhuntMgr.metas.remove(playerIndex);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangedWorldEvent(PlayerChangedWorldEvent event) {
+        if (manhuntMgr.manhuntOngoing && event.getFrom().getEnvironment().equals(World.Environment.NETHER)) {
+
+            if (manhuntMgr.hunters.contains(event.getPlayer().getUniqueId())) {
+                PlayerInventory inv = event.getPlayer().getInventory();
+                for (int i = 0; i < inv.getSize(); i++) {
+                    if (inv.getItem(i) != null && inv.getItem(i).getType().equals(Material.COMPASS)) {
+                        inv.setItem(i, new ItemStack(Material.COMPASS));
+                    }
+                }
+
+            }
+
+            manhuntMgr.trackingNearestPlayer.set(manhuntMgr.hunters.indexOf(event.getPlayer().getUniqueId()), false);
+        }
+    }
+
+    @EventHandler
+    public void onCraftItemEvent(CraftItemEvent event) {
+        if (manhuntMgr.manhuntOngoing && manhuntMgr.hunters.contains(event.getWhoClicked().getUniqueId()) && event.getCurrentItem().getType().equals(Material.COMPASS)) {
+            event.getWhoClicked().sendMessage(ChatColor.GOLD + "You already have a compass!");
+            event.setCancelled(true);
         }
     }
 

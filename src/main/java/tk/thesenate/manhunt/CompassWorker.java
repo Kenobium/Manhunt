@@ -1,10 +1,11 @@
 package tk.thesenate.manhunt;
 
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getPlayer;
@@ -12,8 +13,8 @@ import static org.bukkit.Bukkit.getServer;
 
 public class CompassWorker {
 
-    private final ManhuntMgr manhuntMgr = ManhuntMgr.getInstance();
     static int compassPos;
+    private final ManhuntMgr manhuntMgr = ManhuntMgr.getInstance();
 
     public CompassWorker(Manhunt manhunt) {
 
@@ -31,17 +32,16 @@ public class CompassWorker {
                         manhuntMgr.tracking.set(index, manhuntMgr.getNearestPlayer(hunter));
                     }
 
-                    for (ItemStack i: hunter.getInventory().getContents()) {
-                        if (i != null && i.getType().equals(Material.COMPASS)) {
-                            compassPos = Arrays.asList(hunter.getInventory().getContents()).indexOf(i);
+                    if (hunter.getWorld().getEnvironment().equals(World.Environment.NORMAL) && hunter.getWorld().getEnvironment().equals(manhuntMgr.tracking.get(index).getWorld().getEnvironment())) {
+                        hunter.setCompassTarget(manhuntMgr.tracking.get(index).getLocation());
+                    } else if (hunter.getWorld().getEnvironment().equals(World.Environment.NETHER) && hunter.getWorld().getEnvironment().equals(manhuntMgr.tracking.get(index).getWorld().getEnvironment())) {
+                        for (ItemStack i : hunter.getInventory().getContents()) {
+                            if (i != null && i.getType().equals(Material.COMPASS)) {
+                                CompassMeta im = (CompassMeta) i.getItemMeta();
+                                im.setLodestone(manhuntMgr.tracking.get(index).getLocation());
+                                i.setItemMeta(im);
+                            }
                         }
-                    }
-                    if (manhuntMgr.tracking.get(index) != null) {
-                        manhuntMgr.metas.get(index).setLodestone(manhuntMgr.tracking.get(index).getLocation());
-                        manhuntMgr.compasses.get(index).setItemMeta(manhuntMgr.metas.get(index));
-                    }
-                    if (compassPos != -1) {
-                        hunter.getInventory().setItem(compassPos, manhuntMgr.compasses.get(index));
                     }
                 }
             }
