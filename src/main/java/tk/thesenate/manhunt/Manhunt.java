@@ -11,6 +11,7 @@ public class Manhunt extends JavaPlugin {
         getLogger().info("Manhunt plugin enabled.");
         getServer().getPluginManager().registerEvents(new ManhuntListener(), this);
         getCommand("manhunt").setExecutor(new ManhuntCmd());
+        getCommand("manhunt").setTabCompleter(new ManhuntTabCompleter());
         new CompassWorker(this);
 
     }
