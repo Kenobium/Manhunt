@@ -25,37 +25,38 @@ public class ManhuntCmd implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
+        //refactor to use an enum to cut down on string comparisons?
         if (command.getName().equalsIgnoreCase("manhunt")) {
             if (args.length == 0) {
                 sendUsage(sender);
             } else {
                 if (args[0].equalsIgnoreCase("addHunter")) {
 
-                    addPlayers(sender, args, manhuntMgr.hunters, manhuntMgr.runners);
+                    addPlayers(sender, args, manhuntMgr.getHunters(), manhuntMgr.getRunners());
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("removeHunter")) {
 
-                    removePlayers(sender, args, manhuntMgr.hunters);
+                    removePlayers(sender, args, manhuntMgr.getHunters());
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("addRunner")) {
 
-                    addPlayers(sender, args, manhuntMgr.runners, manhuntMgr.hunters);
+                    addPlayers(sender, args, manhuntMgr.getRunners(), manhuntMgr.getHunters());
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("removeRunner")) {
 
-                    removePlayers(sender, args, manhuntMgr.runners);
+                    removePlayers(sender, args, manhuntMgr.getRunners());
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("start")) {
-                    if (!manhuntMgr.manhuntOngoing) {
-                        manhuntMgr.manhuntOngoing = true;
-                        for (UUID j : manhuntMgr.hunters) {
+                    if (!manhuntMgr.isManhuntOngoing()) {
+                        manhuntMgr.setManhuntOngoing(true);
+                        for (UUID j : manhuntMgr.getHunters()) {
                             Player hunter = getPlayer(j);
                             if (hunter == null) {
-                                manhuntMgr.hunters.remove(j);
+                                manhuntMgr.getHunters().remove(j);
                                 continue;
                             }
                             ItemStack i = new ItemStack(Material.COMPASS, 1);
@@ -64,10 +65,10 @@ public class ManhuntCmd implements CommandExecutor {
                             im.setLodestoneTracked(false);
                             i.setItemMeta(im);
                             hunter.getInventory().addItem(i);
-                            manhuntMgr.trackingNearestPlayer.add(true);
+                            manhuntMgr.isTrackingNearestPlayer().add(true);
 
                         }
-                        manhuntMgr.tracking = new ArrayList<>(Arrays.asList(new Player[manhuntMgr.runners.size()]));
+                        manhuntMgr.setTracking(new ArrayList<>(Arrays.asList(new Player[manhuntMgr.getRunners().size()])));
                         broadcastMessage(ChatColor.GREEN + "Manhunt game started!");
 
                     } else {
@@ -76,16 +77,16 @@ public class ManhuntCmd implements CommandExecutor {
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("stop")) {
-                    if (manhuntMgr.manhuntOngoing) {
-                        manhuntMgr.manhuntOngoing = false;
-                        for (int k = 0; k < manhuntMgr.hunters.size(); k++) {
-                            Player hunter = getPlayer(manhuntMgr.hunters.get(k));
+                    if (manhuntMgr.isManhuntOngoing()) {
+                        manhuntMgr.setManhuntOngoing(false);
+                        for (int k = 0; k < manhuntMgr.getHunters().size(); k++) {
+                            Player hunter = getPlayer(manhuntMgr.getHunters().get(k));
                             if (hunter == null) {
-                                manhuntMgr.hunters.remove(k);
+                                manhuntMgr.getHunters().remove(k);
                                 continue;
                             }
-                            manhuntMgr.trackingNearestPlayer.clear();
-                            manhuntMgr.tracking.clear();
+                            manhuntMgr.isTrackingNearestPlayer().clear();
+                            manhuntMgr.getTracking().clear();
                         }
                         broadcastMessage(ChatColor.GREEN + "Manhunt game ended.");
                     } else {
@@ -96,11 +97,11 @@ public class ManhuntCmd implements CommandExecutor {
                 } else if (args[0].equalsIgnoreCase("list")) {
                     List<String> huntersList = new ArrayList<>();
                     List<String> runnersList = new ArrayList<>();
-                    for (UUID i : manhuntMgr.hunters) {
+                    for (UUID i : manhuntMgr.getHunters()) {
                         huntersList.add(getPlayer(i).getName());
                     }
 
-                    for (UUID j : manhuntMgr.runners) {
+                    for (UUID j : manhuntMgr.getRunners()) {
                         runnersList.add(getPlayer(j).getName());
                     }
 
@@ -116,19 +117,19 @@ public class ManhuntCmd implements CommandExecutor {
         return false;
     }
 
-    private void addPlayers(CommandSender sender, String[] args, ArrayList<UUID> team, ArrayList<UUID> otherTeam) {
+    private void addPlayers(CommandSender sender, String[] args, List<UUID> team, List<UUID> otherTeam) {
         String teamName = "";
         String otherTeamName = "";
 
-        if (team.equals(manhuntMgr.hunters)) {
+        if (team.equals(manhuntMgr.getHunters())) {
             teamName = "'hunters'";
-        } else if (team.equals(manhuntMgr.runners)) {
+        } else if (team.equals(manhuntMgr.getRunners())) {
             teamName = "'speedrunners'";
         }
 
-        if (otherTeam.equals(manhuntMgr.hunters)) {
+        if (otherTeam.equals(manhuntMgr.getHunters())) {
             otherTeamName = "'hunters'";
-        } else if (otherTeam.equals(manhuntMgr.runners)) {
+        } else if (otherTeam.equals(manhuntMgr.getRunners())) {
             otherTeamName = "'speedrunners'";
         }
 
@@ -147,12 +148,12 @@ public class ManhuntCmd implements CommandExecutor {
         }
     }
 
-    private void removePlayers(CommandSender sender, String[] args, ArrayList<UUID> team) {
+    private void removePlayers(CommandSender sender, String[] args, List<UUID> team) {
         String teamName = " ";
 
-        if (team.equals(manhuntMgr.hunters)) {
+        if (team.equals(manhuntMgr.getHunters())) {
             teamName = "'hunters'";
-        } else if (team.equals(manhuntMgr.runners)) {
+        } else if (team.equals(manhuntMgr.getRunners())) {
             teamName = "'speedrunners'";
         }
 

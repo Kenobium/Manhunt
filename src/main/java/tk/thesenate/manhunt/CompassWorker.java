@@ -13,32 +13,31 @@ import static org.bukkit.Bukkit.getServer;
 
 public class CompassWorker {
 
-    static int compassPos;
     private final ManhuntMgr manhuntMgr = ManhuntMgr.getInstance();
 
     public CompassWorker(Manhunt manhunt) {
 
         manhunt.getServer().getScheduler().scheduleSyncRepeatingTask(manhunt, () -> {
-            if (manhuntMgr.manhuntOngoing && getServer().getOnlinePlayers().size() > 1) {
-                for (UUID l : manhuntMgr.hunters) {
+            if (manhuntMgr.isManhuntOngoing() && getServer().getOnlinePlayers().size() > 1) {
+                for (UUID l : manhuntMgr.getHunters()) {
                     Player hunter = getPlayer(l);
-                    int index = manhuntMgr.hunters.indexOf(l);
+                    int index = manhuntMgr.getHunters().indexOf(l);
                     if (hunter == null) {
-                        manhuntMgr.hunters.remove(l);
+                        manhuntMgr.getHunters().remove(l);
                         continue;
                     }
 
-                    if (manhuntMgr.trackingNearestPlayer.get(index)) {
-                        manhuntMgr.tracking.set(index, manhuntMgr.getNearestPlayer(hunter));
+                    if (manhuntMgr.isTrackingNearestPlayer().get(index)) {
+                        manhuntMgr.getTracking().set(index, manhuntMgr.getNearestPlayer(hunter));
                     }
 
-                    if (hunter.getWorld().getEnvironment().equals(World.Environment.NORMAL) && hunter.getWorld().getEnvironment().equals(manhuntMgr.tracking.get(index).getWorld().getEnvironment())) {
-                        hunter.setCompassTarget(manhuntMgr.tracking.get(index).getLocation());
-                    } else if (hunter.getWorld().getEnvironment().equals(World.Environment.NETHER) && hunter.getWorld().getEnvironment().equals(manhuntMgr.tracking.get(index).getWorld().getEnvironment())) {
+                    if (hunter.getWorld().getEnvironment().equals(World.Environment.NORMAL) && hunter.getWorld().getEnvironment().equals(manhuntMgr.getTracking().get(index).getWorld().getEnvironment())) {
+                        hunter.setCompassTarget(manhuntMgr.getTracking().get(index).getLocation());
+                    } else if (hunter.getWorld().getEnvironment().equals(World.Environment.NETHER) && hunter.getWorld().getEnvironment().equals(manhuntMgr.getTracking().get(index).getWorld().getEnvironment())) {
                         for (ItemStack i : hunter.getInventory().getContents()) {
                             if (i != null && i.getType().equals(Material.COMPASS)) {
                                 CompassMeta im = (CompassMeta) i.getItemMeta();
-                                im.setLodestone(manhuntMgr.tracking.get(index).getLocation());
+                                im.setLodestone(manhuntMgr.getTracking().get(index).getLocation());
                                 i.setItemMeta(im);
                             }
                         }
